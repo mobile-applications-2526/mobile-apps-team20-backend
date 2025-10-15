@@ -27,5 +27,7 @@ public class Event {
 
     private Date date;
 
+    private List<EventTag> eventTag;
+
 }
 
