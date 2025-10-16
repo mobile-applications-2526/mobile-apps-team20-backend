@@ -1,12 +1,12 @@
-package com.juangomez.campusconnect.serviceimpl;
+package com.mbproyect.campusconnect.serviceimpl;
 
-import com.juangomez.campusconnect.config.exceptions.event.EventNotFoundException;
-import com.juangomez.campusconnect.dto.event.EventParticipantResponse;
-import com.juangomez.campusconnect.infrastructure.mappers.event.EventParticipantMapper;
-import com.juangomez.campusconnect.infrastructure.repository.EventRepository;
-import com.juangomez.campusconnect.model.entity.event.Event;
-import com.juangomez.campusconnect.model.entity.event.EventParticipant;
-import com.juangomez.campusconnect.service.EventParticipantService;
+import com.mbproyect.campusconnect.config.exceptions.event.EventNotFoundException;
+import com.mbproyect.campusconnect.dto.event.response.EventParticipantResponse;
+import com.mbproyect.campusconnect.infrastructure.mappers.event.EventParticipantMapper;
+import com.mbproyect.campusconnect.infrastructure.repository.EventRepository;
+import com.mbproyect.campusconnect.model.entity.event.Event;
+import com.mbproyect.campusconnect.model.entity.event.EventParticipant;
+import com.mbproyect.campusconnect.service.EventParticipantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 public class EventParticipantServiceImpl implements EventParticipantService {
 
     private final EventRepository eventRepository;
+    // TODO: Implement user repository interface for fetching user to link it with a new participant
+    // private UserRepository userRepository;
 
     public EventParticipantServiceImpl(EventRepository eventRepository) {
         this.eventRepository = eventRepository;

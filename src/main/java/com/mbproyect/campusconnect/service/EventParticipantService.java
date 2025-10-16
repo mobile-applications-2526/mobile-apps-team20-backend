@@ -1,12 +1,16 @@
-package com.juangomez.campusconnect.service;
+package com.mbproyect.campusconnect.service;
 
-import com.juangomez.campusconnect.dto.event.EventParticipantResponse;
+import com.mbproyect.campusconnect.dto.event.response.EventParticipantResponse;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Set;
 import java.util.UUID;
+
+/***
+ *  Contract which specify the requirements to implement an eventParticipant service
+ */
 
 @Service
 @Validated
