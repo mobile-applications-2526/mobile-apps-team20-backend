@@ -12,8 +12,10 @@ import com.mbproyect.campusconnect.model.entity.event.Event;
 import com.mbproyect.campusconnect.model.entity.event.EventBio;
 import com.mbproyect.campusconnect.model.enums.EventStatus;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
-import com.mbproyect.campusconnect.infrastructure.repository.EventRepository;
+import com.mbproyect.campusconnect.infrastructure.repository.event.EventRepository;
 import com.mbproyect.campusconnect.service.EventService;
+import com.mbproyect.campusconnect.shared.validation.EventValidator;
+import com.mbproyect.campusconnect.shared.validation.UserValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +29,17 @@ import java.util.stream.Collectors;
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
+    private final UserValidator userValidator;
+    private final EventValidator eventValidator;
 
-    public EventServiceImpl(EventRepository eventRepository) {
+
+    public EventServiceImpl(
+            EventRepository eventRepository,
+            UserValidator userValidator,
+            EventValidator eventValidator) {
         this.eventRepository = eventRepository;
+        this.userValidator = userValidator;
+        this.eventValidator = eventValidator;
     }
 
     private Set<EventResponse> eventSetToResponse (Set<Event> events) {
@@ -69,19 +79,10 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventResponse getEventById(UUID id) {
-        Event event = eventRepository.getEventByEventId(id);
-
-        if ( event == null ) {
-            log.error("Event with id {} not found", id);
-            throw new EventNotFoundException("Event not found");
-        }
-
-        if (event.getEventStatus().equals(EventStatus.CANCELLED)) {
-            throw new EventCancelledException("Event " + id +" was cancelled");
-        }
+        Event event = eventValidator.validateEventExists(id);
+        eventValidator.validateEventIsActive(event);
 
         log.info("Returning event with id {}", id);
-
         return EventMapper.toResponse(event);  // Parse event to event
     }
 
@@ -132,10 +133,8 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventResponse updateEvent(EventRequest eventRequest, UUID eventId) {
         //  Find existing event or throw exception if not found
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EventNotFoundException(
-                        "Event not found with id: " + eventId
-                ));
+        Event event = eventValidator.validateEventExists(eventId);
+        eventValidator.validateEventIsActive(event);
 
         boolean hasChanged = false; // Flag to track if any field was modified
 
@@ -205,7 +204,6 @@ public class EventServiceImpl implements EventService {
 
         // Update event state to cancelled
         event.setEventStatus(EventStatus.CANCELLED);
-
         log.info("Event with id {} cancelled", eventId);
 
         // TODO: Notify participants sending email

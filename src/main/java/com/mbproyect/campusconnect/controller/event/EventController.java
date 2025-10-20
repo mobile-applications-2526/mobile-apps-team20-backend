@@ -1,9 +1,11 @@
 package com.mbproyect.campusconnect.controller.event;
 
 import com.mbproyect.campusconnect.dto.event.request.EventRequest;
+import com.mbproyect.campusconnect.dto.event.response.EventParticipantResponse;
 import com.mbproyect.campusconnect.dto.event.response.EventResponse;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
 
+import com.mbproyect.campusconnect.service.EventParticipantService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.mbproyect.campusconnect.service.EventService;
@@ -20,9 +22,11 @@ import java.util.*;
 public class EventController {
 
     private final EventService eventService;
+    private final EventParticipantService eventParticipantService;
 
-    public EventController (EventService eventService) {
+    public EventController (EventService eventService, EventParticipantService eventParticipantService) {
         this.eventService = eventService;
+        this.eventParticipantService = eventParticipantService;
     }
 
     /**
@@ -30,7 +34,6 @@ public class EventController {
      */
     @GetMapping("/{eventId}")
     public ResponseEntity<EventResponse> getEventById(@PathVariable UUID eventId) {
-        log.info("GET /api/events/{}", eventId);
         EventResponse response = eventService.getEventById(eventId);
         System.out.println(response);
         return ResponseEntity.ok(response);
@@ -42,7 +45,6 @@ public class EventController {
      */
     @GetMapping("/by-tag")
     public ResponseEntity<Set<EventResponse>> getEventsByTag(@RequestParam Set<InterestTag> tags) {
-        log.info("GET /api/events/by-tag {}", tags);
         Set<EventResponse> responses = eventService.getEventsByTag(tags);
         return ResponseEntity.ok(responses);
     }
@@ -53,7 +55,6 @@ public class EventController {
      */
     @GetMapping("/by-date")
     public ResponseEntity<List<EventResponse>> getEventsByDateAscending(@RequestParam LocalDateTime eventDate) {
-        log.info("GET /api/events/by-date {}", eventDate);
         List<EventResponse> responses = eventService.getEventsByDateAscending(eventDate);
         return ResponseEntity.ok(responses);
     }
@@ -63,31 +64,63 @@ public class EventController {
      * Example: /api/events/by-location?city=Leuven
      */
     @GetMapping("/by-location")
-    public ResponseEntity<Set<EventResponse>> getEventsByLocation(@RequestParam String city) {
-        log.info("GET /api/events/by-location {}", city);
+    public ResponseEntity<Set<EventResponse>> getEventsByLocation(
+            @RequestParam String city
+    ) {
         Set<EventResponse> responses = eventService.getEventsByLocation(city);
         return ResponseEntity.ok(responses);
     }
 
+    @GetMapping("/{eventId}/participants")
+    public ResponseEntity<Set<EventParticipantResponse>> getEventParticipants(
+            @PathVariable UUID eventId
+    ) {
+        return ResponseEntity.ok(eventParticipantService.getParticipantsByEvent(eventId));
+    }
+
     @PostMapping
-    public ResponseEntity<EventResponse> createEvent(@Valid @RequestBody EventRequest eventRequest) {
-        log.info("POST /api/events - Creating new event");
+    public ResponseEntity<EventResponse> createEvent(
+            @Valid @RequestBody EventRequest eventRequest
+    ) {
         EventResponse response = eventService.createEvent(eventRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    // This is a temporal version while there is not auth
+    @PostMapping("/participants/{participantId}/{userId}")
+    public ResponseEntity<EventParticipantResponse> subscribeToEvent(
+            @PathVariable UUID participantId, @PathVariable UUID userId
+    ) {
+        EventParticipantResponse eventParticipantResponse = eventParticipantService
+                .subscribeToEvent(participantId, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(eventParticipantResponse);
+    }
+
+
     @PutMapping("/{eventId}")
-    public ResponseEntity<EventResponse> updateEvent(@Valid @RequestBody EventRequest eventRequest,
-                                                     @PathVariable UUID eventId) {
-        log.info("PUT /api/events/{} - Updating event", eventId);
+    public ResponseEntity<EventResponse> updateEvent(
+            @Valid @RequestBody EventRequest eventRequest,
+            @PathVariable UUID eventId
+    ) {
         EventResponse response = eventService.updateEvent(eventRequest, eventId);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{eventId}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable UUID eventId) {
-        log.info("DELETE /api/events/{}", eventId);
+    public ResponseEntity<Void> deleteEvent(
+            @PathVariable UUID eventId
+    ) {
         eventService.deleteEvent(eventId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // This is a temporal version while there is not auth
+    @DeleteMapping("/{eventId}/participants/{userProfileId}")
+    public ResponseEntity<Void> cancelEventSubscription(
+            @PathVariable UUID eventId,
+            @PathVariable UUID userProfileId
+    ) {
+        eventParticipantService.cancelEventSubscription(eventId, userProfileId);
         return ResponseEntity.noContent().build();
     }
 }

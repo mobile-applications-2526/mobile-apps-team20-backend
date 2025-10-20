@@ -20,5 +20,5 @@ public interface EventParticipantService {
 
     EventParticipantResponse subscribeToEvent(@NotNull UUID eventId, @NotNull UUID userId);
 
-    void cancelEventSubscription(@NotNull UUID eventId, @NotNull UUID userId);
+    void cancelEventSubscription(@NotNull UUID participantId, @NotNull UUID userId);
 }
