@@ -47,12 +47,12 @@ public class EventParticipantServiceImpl implements EventParticipantService {
     }
 
     @Override
-    public EventParticipantResponse addParticipant(UUID eventId, UUID userId) {
+    public EventParticipantResponse subscribeToEvent(UUID eventId, UUID userId) {
         return null; // TODO
     }
 
     @Override
-    public void removeParticipant(UUID eventId, UUID userId) {
+    public void cancelEventSubscription(UUID eventId, UUID userId) {
         // TODO
     }
 }

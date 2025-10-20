@@ -18,7 +18,7 @@ public interface EventParticipantService {
 
     Set<EventParticipantResponse> getParticipantsByEvent(@NotNull UUID eventId);
 
-    EventParticipantResponse addParticipant(@NotNull UUID eventId, @NotNull UUID userId);
+    EventParticipantResponse subscribeToEvent(@NotNull UUID eventId, @NotNull UUID userId);
 
-    void removeParticipant(@NotNull UUID eventId, @NotNull UUID userId);
+    void cancelEventSubscription(@NotNull UUID eventId, @NotNull UUID userId);
 }
