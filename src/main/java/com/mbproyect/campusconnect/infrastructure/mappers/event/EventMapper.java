@@ -22,13 +22,10 @@ public class EventMapper {
         response.setName(event.getName());
         response.setEventBio(EventBioMapper.toResponse(event.getEventBio()));
         response.setOrganiser(EventOrganiserMapper.toResponse(event.getOrganiser()));
-        System.out.println("3");
         response.setLocation(event.getLocation());
         response.setStartDate(event.getStartDate());
         response.setEndDate(event.getEndDate());
-        System.out.println("4");
 
-        System.out.println(response);
         return response;
     }
 
