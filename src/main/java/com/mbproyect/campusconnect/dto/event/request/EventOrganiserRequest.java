@@ -2,6 +2,7 @@ package com.mbproyect.campusconnect.dto.event.request;
 
 import com.mbproyect.campusconnect.dto.user.request.UserProfileRequest;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,9 @@ import java.util.UUID;
 @NoArgsConstructor
 public class EventOrganiserRequest {
 
+    @NotNull
     private UserProfileRequest userProfile;
 
-    private Set<UUID> eventsIds;
+    @NotNull
+    private Set<UUID> eventsIds; //TODO Should it be onetoone?
 }
