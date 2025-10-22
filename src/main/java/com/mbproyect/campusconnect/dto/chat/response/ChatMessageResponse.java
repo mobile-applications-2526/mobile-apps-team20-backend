@@ -1,4 +1,4 @@
-package com.mbproyect.campusconnect.dto.eventchat.response;
+package com.mbproyect.campusconnect.dto.chat.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
