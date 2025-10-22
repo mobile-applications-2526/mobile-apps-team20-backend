@@ -1,5 +1,6 @@
 package com.mbproyect.campusconnect.service.event;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mbproyect.campusconnect.dto.event.request.EventRequest;
 import com.mbproyect.campusconnect.dto.event.response.EventResponse;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
@@ -26,7 +27,9 @@ public interface EventService {
 
      Set<EventResponse> getEventsByAnyTag(@NotNull Set<InterestTag> tags);
 
-     List<EventResponse> getEventsByDateAscending (@NotNull LocalDateTime eventDate);
+     List<EventResponse> getEventsByDateAscending (
+             @JsonFormat(pattern ="yyyy-MM-dd'T'HH:mm") @NotNull LocalDateTime eventDate
+     );
 
      Set<EventResponse> getEventsByLocation (@NotBlank String city);
 

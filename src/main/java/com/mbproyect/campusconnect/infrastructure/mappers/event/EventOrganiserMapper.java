@@ -22,21 +22,9 @@ public class EventOrganiserMapper {
             return null;
         }
 
-        // Map the embedded UserProfile
-        UserProfileResponse userProfileResponse =
-                UserProfileMapper.toResponse(organiser.getUserProfile());
-
-        // Extract the event IDs only (no recursion)
-        Set<UUID> eventIds = organiser.getEvents() != null
-                ? organiser.getEvents().stream()
-                .map(Event::getEventId)
-                .collect(Collectors.toSet())
-                : Set.of();
-
         EventOrganiserResponse response = new EventOrganiserResponse();
         response.setId(organiser.getId());
-        response.setUserProfile(userProfileResponse);
-        response.setEventsIds(eventIds);
+        response.setUsername(organiser.getUserProfile().getUserName());
 
         return response;
     }
