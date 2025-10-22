@@ -1,33 +1,27 @@
 package com.mbproyect.campusconnect.shared.util;
 
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-@Component
 public class EncryptionUtil {
 
     private static final String AES = "AES";
     private static final String AES_GCM_NO_PADDING = "AES/GCM/NoPadding";
-    private static final int GCM_TAG_LENGTH = 128; // bits
-    private static final int IV_LENGTH = 12;       // bytes
+    private static final int GCM_TAG_LENGTH = 128;
+    private static final int IV_LENGTH = 12;
 
-    // Static key used by the static encrypt/decrypt methods
-    private static byte[] secretKeyBytes;
+    // Load once when the class loads
+    private static final byte[] secretKeyBytes = loadKey();
 
-    // Injected only once by Spring
-    @Value("${app.encryption-key}")
-    private String base64Key;
-
-    @PostConstruct
-    private void init() {
-        secretKeyBytes = Base64.getDecoder().decode(base64Key);
+    private static byte[] loadKey() {
+        String base64Key = System.getenv("CHAT_SECRET_KEY");
+        if (base64Key == null || base64Key.isBlank()) {
+            throw new IllegalStateException("CHAT_SECRET_KEY environment variable not set");
+        }
+        return Base64.getDecoder().decode(base64Key);
     }
 
     public static String encrypt(String plainText) {
