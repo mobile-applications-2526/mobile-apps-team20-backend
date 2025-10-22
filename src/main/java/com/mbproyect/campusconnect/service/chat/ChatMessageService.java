@@ -1,4 +1,4 @@
-package com.mbproyect.campusconnect.service;
+package com.mbproyect.campusconnect.service.chat;
 
 import com.mbproyect.campusconnect.dto.chat.request.ChatMessageRequest;
 import com.mbproyect.campusconnect.dto.chat.response.ChatMessageResponse;
