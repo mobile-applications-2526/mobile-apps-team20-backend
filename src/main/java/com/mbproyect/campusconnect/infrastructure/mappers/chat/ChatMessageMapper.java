@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChatMessageMapper {
 
-    public ChatMessage toEntity(EventChat chat, UserProfile sender, String encryptedText) {
+    static public ChatMessage toEntity(EventChat chat, UserProfile sender, String encryptedText) {
         ChatMessage message = new ChatMessage();
         message.setChat(chat);
         message.setSender(sender);
@@ -18,7 +18,7 @@ public class ChatMessageMapper {
     }
 
 
-    public ChatMessageResponse toResponse(ChatMessage entity, String decryptedText) {
+    static public ChatMessageResponse toResponse(ChatMessage entity, String decryptedText) {
         return new ChatMessageResponse(
                 entity.getId(),
                 entity.getSender().getId(),

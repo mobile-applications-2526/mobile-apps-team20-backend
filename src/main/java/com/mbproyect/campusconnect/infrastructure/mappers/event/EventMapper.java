@@ -2,6 +2,7 @@ package com.mbproyect.campusconnect.infrastructure.mappers.event;
 
 import com.mbproyect.campusconnect.dto.event.request.EventRequest;
 import com.mbproyect.campusconnect.dto.event.response.EventResponse;
+import com.mbproyect.campusconnect.infrastructure.mappers.chat.ChatMapper;
 import com.mbproyect.campusconnect.model.entity.event.*;
 import com.mbproyect.campusconnect.model.enums.EventStatus;
 
@@ -25,6 +26,9 @@ public class EventMapper {
         response.setLocation(event.getLocation());
         response.setStartDate(event.getStartDate());
         response.setEndDate(event.getEndDate());
+        System.out.println("sds");
+        response.setChatResponse(ChatMapper.toResponse(event.getChat()));
+        System.out.println("sscds");
 
         return response;
     }
