@@ -13,5 +13,4 @@ public class EventChatResponse {
 
     private UUID id;
 
-    private long messageCount;
 }

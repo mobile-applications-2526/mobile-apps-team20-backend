@@ -24,7 +24,7 @@ public class EventResponse {
 
     private EventLocation location;
 
-    private EventChatResponse chatResponse;
+    private EventChatResponse chat;
 
     private LocalDateTime startDate;
 
