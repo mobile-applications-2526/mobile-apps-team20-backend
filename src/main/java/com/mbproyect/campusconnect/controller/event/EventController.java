@@ -5,10 +5,10 @@ import com.mbproyect.campusconnect.dto.event.response.EventParticipantResponse;
 import com.mbproyect.campusconnect.dto.event.response.EventResponse;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
 
-import com.mbproyect.campusconnect.service.EventParticipantService;
+import com.mbproyect.campusconnect.service.event.EventParticipantService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.mbproyect.campusconnect.service.EventService;
+import com.mbproyect.campusconnect.service.event.EventService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
