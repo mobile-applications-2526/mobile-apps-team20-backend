@@ -15,7 +15,6 @@ import java.util.UUID;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {
-    Event getEventByEventId(UUID eventId);
 
     Set<Event> findByLocation_City(String locationCity);
 
@@ -34,4 +33,5 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     """)
     Set<Event> getEventsByTags (@Param("tag") Set<InterestTag> tags, @Param("status") EventStatus status);
 
+    Event findByEventId(UUID eventId);
 }

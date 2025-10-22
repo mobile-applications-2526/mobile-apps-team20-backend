@@ -21,7 +21,7 @@ public class EventValidator {
     }
 
     public Event validateEventExists(UUID eventId) {
-        Event event = eventRepository.getEventByEventId(eventId);
+        Event event = eventRepository.findByEventId(eventId);
         if (event == null) {
             log.error("Event with id {} not found", eventId);
             throw new EventNotFoundException("Event with id " + eventId + " not found");

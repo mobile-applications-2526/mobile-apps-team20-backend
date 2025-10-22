@@ -23,6 +23,6 @@ public class EventOrganiser {
     @OneToOne
     private UserProfile userProfile;
 
-    @OneToMany(mappedBy = "organiser", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "organiser")
     private Set<Event> events = new HashSet<>();
 }

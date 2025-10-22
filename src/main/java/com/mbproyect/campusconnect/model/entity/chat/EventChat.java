@@ -12,6 +12,8 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = "event")
+@ToString(exclude = "event")
 public class EventChat {
 
     @Id

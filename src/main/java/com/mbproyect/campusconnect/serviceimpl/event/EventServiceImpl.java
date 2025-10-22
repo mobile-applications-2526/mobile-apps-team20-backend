@@ -16,6 +16,7 @@ import com.mbproyect.campusconnect.service.event.EventService;
 import com.mbproyect.campusconnect.shared.validation.event.EventValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -203,7 +204,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public void deleteEvent(UUID eventId) {
         //TODO: Check if user is event manager
-        Event event = eventRepository.getEventByEventId(eventId);
+        Event event = eventRepository.findByEventId(eventId);
 
         // Update event state to cancelled
         event.setEventStatus(EventStatus.CANCELLED);

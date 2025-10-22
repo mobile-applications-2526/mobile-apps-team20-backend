@@ -3,18 +3,19 @@ package com.mbproyect.campusconnect.model.entity.event;
 import com.mbproyect.campusconnect.model.entity.chat.EventChat;
 import com.mbproyect.campusconnect.model.enums.EventStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = "chat")
+@ToString(exclude = "chat")
 public class Event {
 
     @Id
