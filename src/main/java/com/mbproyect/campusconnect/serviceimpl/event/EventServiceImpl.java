@@ -16,7 +16,6 @@ import com.mbproyect.campusconnect.service.event.EventService;
 import com.mbproyect.campusconnect.shared.validation.event.EventValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -86,8 +85,8 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Set<EventResponse> getEventsByTag(Set<InterestTag> tags) {
-        Set<Event> events = eventRepository.getEventsByTags(tags, EventStatus.ACTIVE);
+    public Set<EventResponse> getEventsByAnyTag(Set<InterestTag> tags) {
+        Set<Event> events = eventRepository.getEventsByAnyTag(tags, EventStatus.ACTIVE);
 
         log.info("Returning events with interest tags:  {}", tags);
         return eventSetToResponse(events);

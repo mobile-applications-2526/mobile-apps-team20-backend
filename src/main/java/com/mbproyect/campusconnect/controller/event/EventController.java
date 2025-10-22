@@ -42,9 +42,9 @@ public class EventController {
      * Get all events that have the given interest tags
      * Example: /api/events/by-tag?tags=MUSIC&tags=SPORTS
      */
-    @GetMapping("/by-tag")
-    public ResponseEntity<Set<EventResponse>> getEventsByTag(@RequestParam Set<InterestTag> tags) {
-        Set<EventResponse> responses = eventService.getEventsByTag(tags);
+    @GetMapping("/by-any-tag")
+    public ResponseEntity<Set<EventResponse>> getEventsByAnyTag(@RequestParam Set<InterestTag> tags) {
+        Set<EventResponse> responses = eventService.getEventsByAnyTag(tags);
         return ResponseEntity.ok(responses);
     }
 

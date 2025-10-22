@@ -28,10 +28,10 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         SELECT e FROM Event e
         JOIN e.eventBio b
         JOIN b.interestTags t
-        WHERE t IN :tags 
+        WHERE t IN :tags
         AND e.eventStatus = :status
     """)
-    Set<Event> getEventsByTags (@Param("tag") Set<InterestTag> tags, @Param("status") EventStatus status);
+    Set<Event> getEventsByAnyTag(@Param("tags") Set<InterestTag> tags, @Param("status") EventStatus status);
 
     Event findByEventId(UUID eventId);
 }

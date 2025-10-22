@@ -24,7 +24,7 @@ public interface EventService {
 
       EventResponse getEventById(@NotNull UUID eventId);
 
-     Set<EventResponse> getEventsByTag (@NotNull Set<InterestTag> tags);
+     Set<EventResponse> getEventsByAnyTag(@NotNull Set<InterestTag> tags);
 
      List<EventResponse> getEventsByDateAscending (@NotNull LocalDateTime eventDate);
 
