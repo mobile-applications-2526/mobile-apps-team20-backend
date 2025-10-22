@@ -26,9 +26,7 @@ public class EventMapper {
         response.setLocation(event.getLocation());
         response.setStartDate(event.getStartDate());
         response.setEndDate(event.getEndDate());
-        System.out.println("sds");
-        response.setChatResponse(ChatMapper.toResponse(event.getChat()));
-        System.out.println("sscds");
+        response.setChat(ChatMapper.toResponse(event.getChat()));
 
         return response;
     }

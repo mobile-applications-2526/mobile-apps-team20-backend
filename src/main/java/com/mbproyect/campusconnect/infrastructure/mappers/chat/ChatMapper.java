@@ -9,8 +9,6 @@ public class ChatMapper {
         if (chat == null) {
             throw new IllegalArgumentException("Chat cannot be null");
         }
-        return new EventChatResponse(
-                chat.getId(), chat.getMessages().size()
-        );
+        return new EventChatResponse(chat.getId());
     }
 }
