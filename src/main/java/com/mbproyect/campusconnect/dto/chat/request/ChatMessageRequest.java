@@ -16,4 +16,7 @@ public class ChatMessageRequest {
     @NotBlank(message = "Message content cannot be empty")
     private String content;
 
+    @NotNull
+    private UUID userProfileId;
+
 }
