@@ -18,6 +18,8 @@ public class EventParticipant {
     @EqualsAndHashCode.Include
     private UUID id;
 
+    private String email;
+
     @ManyToOne
     private UserProfile userProfile;
 

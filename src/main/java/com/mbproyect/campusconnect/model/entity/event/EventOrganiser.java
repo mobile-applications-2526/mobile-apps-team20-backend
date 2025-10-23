@@ -20,6 +20,8 @@ public class EventOrganiser {
     @EqualsAndHashCode.Include
     private UUID id;
 
+    private String email;
+
     @OneToOne
     private UserProfile userProfile;
 
