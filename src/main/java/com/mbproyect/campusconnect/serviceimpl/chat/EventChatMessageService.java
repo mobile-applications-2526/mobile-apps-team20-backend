@@ -7,6 +7,7 @@ import com.mbproyect.campusconnect.dto.chat.response.ChatMessageResponse;
 import com.mbproyect.campusconnect.infrastructure.mappers.chat.ChatMessageMapper;
 import com.mbproyect.campusconnect.infrastructure.repository.chat.ChatMessageRepository;
 import com.mbproyect.campusconnect.infrastructure.repository.chat.ChatRepository;
+import com.mbproyect.campusconnect.infrastructure.repository.user.UserProfileRepository;
 import com.mbproyect.campusconnect.infrastructure.repository.user.UserRepository;
 import com.mbproyect.campusconnect.model.entity.chat.ChatMessage;
 import com.mbproyect.campusconnect.model.entity.chat.EventChat;
@@ -22,16 +23,16 @@ public class EventChatMessageService implements ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRepository chatRepository;
-    private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
 
     public EventChatMessageService (
             ChatMessageRepository chatMessageRepository,
             ChatRepository chatRepository,
-            UserRepository userRepository
+            UserProfileRepository userRepository
     ) {
         this.chatMessageRepository = chatMessageRepository;
         this.chatRepository = chatRepository;
-        this.userRepository = userRepository;
+        this.userProfileRepository = userRepository;
     }
 
     @Override
@@ -43,12 +44,8 @@ public class EventChatMessageService implements ChatMessageService {
         }
 
         //TODO: When server authenticated, take userprofile by the actual user of the token
-        UserProfile sender = userRepository
-                .findUserByUserProfile_Id(chatMessageRequest.getUserProfileId());
-
-        if (sender == null) {
-            throw new UserNotFoundException("Invalid userprofile id");
-        }
+        UserProfile sender = userProfileRepository.findById(chatMessageRequest.getUserProfileId())
+                .orElseThrow(() -> new UserNotFoundException("Invalid userprofile id"));
 
         // Use helper to encrypt message content in the db
         String encryptedContent = EncryptionUtil.encrypt(chatMessageRequest.getContent());
