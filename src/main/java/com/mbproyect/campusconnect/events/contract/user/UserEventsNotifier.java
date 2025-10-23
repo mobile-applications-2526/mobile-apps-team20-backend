@@ -1,8 +1,9 @@
-package com.mbproyect.campusconnect.events.user;
+package com.mbproyect.campusconnect.events.contract.user;
+
 
 public interface UserEventsNotifier {
 
-    void onEventChanged();
+    void onUserRegisteredEvent();
 
-    void onEventCancelled();
+    void onUserLoggedEvent();
 }
