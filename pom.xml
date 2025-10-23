@@ -30,6 +30,8 @@
         <java.version>21</java.version>
     </properties>
     <dependencies>
+
+        <!-- Web support (needed for running the WebSocket endpoint) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -81,11 +83,6 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
-        <!-- Web support (needed for running the WebSocket endpoint) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.webjars</groupId>
@@ -96,6 +93,8 @@
     </dependencies>
 
     <build>
+<!--        Edited for naming the .jar-->
+        <finalName>CampusConnect</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
