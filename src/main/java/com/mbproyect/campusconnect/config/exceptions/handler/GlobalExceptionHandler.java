@@ -5,15 +5,21 @@ package com.mbproyect.campusconnect.config.exceptions.handler;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.mbproyect.campusconnect.config.exceptions.chat.ChatNotFoundException;
 import com.mbproyect.campusconnect.config.exceptions.event.*;
+import com.mbproyect.campusconnect.config.exceptions.user.InvalidTokenException;
+import com.mbproyect.campusconnect.config.exceptions.user.UserAlreadyExistsException;
+import com.mbproyect.campusconnect.config.exceptions.user.UserNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.nio.file.AccessDeniedException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -40,22 +46,24 @@ public class GlobalExceptionHandler {
             ConstraintViolationException.class,         // Request parameters validation
             MethodArgumentTypeMismatchException.class,   // When cannot convert a request parameter to object
             MissingServletRequestParameterException.class,
-            InvalidDateException.class
+            InvalidDateException.class,
+            InvalidTokenException.class
     })
     public ResponseEntity<ErrorResponse> handleBadRequestException(RuntimeException exception, WebRequest request) {
         return createErrorResponseEntity(exception, request, HttpStatus.BAD_REQUEST);
     }
 
-//    @ExceptionHandler({
-////            BadCredentialsException.class,
-//    })
-//    public ResponseEntity<ErrorResponse> handleAuthenticationException(RuntimeException exception, WebRequest request) {
-//        return createErrorResponseEntity(exception, request, HttpStatus.UNAUTHORIZED);
-//    }
+    @ExceptionHandler({
+            BadCredentialsException.class,
+    })
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(RuntimeException exception, WebRequest request) {
+        return createErrorResponseEntity(exception, request, HttpStatus.UNAUTHORIZED);
+    }
 
     @ExceptionHandler({
-//            AccessDeniedException.class,
+            AccessDeniedException.class,
             IllegalStateException.class,
+            UserAlreadyExistsException.class
     })
     public ResponseEntity<ErrorResponse> handlerAuthorisationException(RuntimeException exception, WebRequest request) {
         return createErrorResponseEntity(exception, request, HttpStatus.FORBIDDEN);

@@ -1,4 +1,7 @@
 package com.mbproyect.campusconnect.config.exceptions.user;
 
-public class InvalidTokenException {
+public class InvalidTokenException extends RuntimeException{
+    public InvalidTokenException(String message) {
+        super(message);
+    }
 }
