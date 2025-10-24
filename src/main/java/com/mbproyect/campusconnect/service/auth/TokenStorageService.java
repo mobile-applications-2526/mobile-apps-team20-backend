@@ -16,4 +16,6 @@ public interface TokenStorageService {
     boolean isTokenValid (@NotNull String key);
 
     String getToken (@NotNull String key);
+
+    void removeToken (@NotNull String key);
 }

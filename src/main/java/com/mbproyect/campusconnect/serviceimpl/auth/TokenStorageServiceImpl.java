@@ -36,4 +36,9 @@ public class TokenStorageServiceImpl implements TokenStorageService {
         String token = redisTemplate.opsForValue().get(key);
         return  token != null ?  token : "";
     }
+
+    @Override
+    public void removeToken(String key) {
+        redisTemplate.delete(key);
+    }
 }
