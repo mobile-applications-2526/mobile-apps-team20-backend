@@ -9,8 +9,10 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserAuthenticationResponse {
 
-    private UUID id;
-
     private String email;
+
+    private String jwt;
+
+    private UUID refreshToken;
 
 }
