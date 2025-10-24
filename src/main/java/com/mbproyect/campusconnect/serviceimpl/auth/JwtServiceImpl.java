@@ -55,7 +55,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateToken(String email) {
         Map<String, Object> claims = new HashMap<>();
-        long JWT_EXPIRATION = 1000 * 60 * 30; // 30 mins
+        long JWT_EXPIRATION = 1000 * 60 * TokenType.JWT.getTtlMinutes().toMinutes(); // 30 mins
 
         String key = TokenType.concatenate(email, TokenType.JWT);
 
