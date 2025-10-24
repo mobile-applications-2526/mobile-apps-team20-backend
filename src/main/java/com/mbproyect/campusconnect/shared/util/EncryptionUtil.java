@@ -5,6 +5,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.UUID;
 
 public class EncryptionUtil {
 
@@ -22,6 +23,19 @@ public class EncryptionUtil {
             throw new IllegalStateException("CHAT_SECRET_KEY environment variable not set");
         }
         return Base64.getDecoder().decode(base64Key);
+    }
+
+    public static String generateNumericCode(int length) {
+        SecureRandom random = new SecureRandom();
+        StringBuilder code = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            code.append(random.nextInt(10)); // Numbers from 0 to 9
+        }
+        return code.toString();
+    }
+
+    public static UUID generateToken() {
+        return UUID.randomUUID();
     }
 
     public static String encrypt(String plainText) {
