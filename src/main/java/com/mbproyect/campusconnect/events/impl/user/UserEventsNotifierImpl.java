@@ -24,7 +24,7 @@ public class UserEventsNotifierImpl implements UserEventsNotifier {
                         "If you didn’t create an account, please ignore this message.%n%n" +
                         "Best regards,%n" +
                         "The %s Support Team",
-                "Campus connect", activationLink, "Campus connect"
+                "CampusConnect", activationLink, "Campus connect"
         );
 
         mailService.sendEmail(email, "Account activation", body);
@@ -33,15 +33,27 @@ public class UserEventsNotifierImpl implements UserEventsNotifier {
 
     @Override
     public void onUserLoggedEvent(String email, String verificationCode) {
-        String body = String.format(
-                "Hello,\n\n" +
-                        "Your verification code to access your account is: %s\n\n" +
-                        "This code will expire in 10 minutes.\n" +
-                        "If you didn’t request this code, please ignore this message.\n\n" +
-                        "Best regards,\n" +
-                        "The %s Support Team",
-                verificationCode, "Campus connect"
-        );
+        String body = String.format("""
+            <html>
+              <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #222;">
+                <p>Hi!,</p>
+                <p>Your verification code to access your account is:</p>
+                <div style="text-align: center; margin: 20px 0;">
+                  <span style="display: inline-block; background-color: #f3f4f6; color: #2d3748;
+                               font-size: 28px; letter-spacing: 4px; font-weight: bold;
+                               padding: 12px 24px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <h1>%s</h1>
+                  </span>
+                </div>
+                <p>This code will expire in 10 minutes.</p>
+                <p>If you didn’t request this code, please ignore this message.</p>
+                <br/>
+                <p>Best regards,<br/>
+                   <strong>The %s Support Team</strong></p>
+              </body>
+            </html>
+            """, verificationCode, "CampusConnect");
+
         mailService.sendEmail(email, "Account verification", body);
     }
 }
