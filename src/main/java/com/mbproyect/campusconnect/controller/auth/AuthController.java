@@ -48,7 +48,7 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/activate-account")
+    @GetMapping("/activate-account")
     public ResponseEntity<String> activateAccount(
             @RequestParam String emailToken,
             @RequestBody UserAuthRequest request
