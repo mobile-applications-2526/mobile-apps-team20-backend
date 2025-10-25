@@ -23,15 +23,18 @@ public class EventChatMessageService implements ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRepository chatRepository;
     private final UserProfileRepository userProfileRepository;
+    private final EncryptionUtil encryptionUtil;
 
     public EventChatMessageService (
             ChatMessageRepository chatMessageRepository,
             ChatRepository chatRepository,
-            UserProfileRepository userRepository
+            UserProfileRepository userRepository,
+            EncryptionUtil encryptionUtil
     ) {
         this.chatMessageRepository = chatMessageRepository;
         this.chatRepository = chatRepository;
         this.userProfileRepository = userRepository;
+        this.encryptionUtil = encryptionUtil;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class EventChatMessageService implements ChatMessageService {
                 .orElseThrow(() -> new UserNotFoundException("Invalid userprofile id"));
 
         // Use helper to encrypt message content in the db
-        String encryptedContent = EncryptionUtil.encrypt(chatMessageRequest.getContent());
+        String encryptedContent = encryptionUtil.encrypt(chatMessageRequest.getContent());
 
         ChatMessage message = ChatMessageMapper
                 .toEntity(eventChat, sender, encryptedContent);
