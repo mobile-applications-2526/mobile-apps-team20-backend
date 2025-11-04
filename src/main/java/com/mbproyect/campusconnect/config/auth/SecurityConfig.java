@@ -38,7 +38,11 @@ public class SecurityConfig {
                                 "/auth/register",
                                 "/auth/validate-code",
                                 "/auth/activate-account",
-                                "/auth/refresh-token"
+                                "/auth/refresh-token",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
                         ) // Authorized endpoints
                         .permitAll()
                         .anyRequest()
