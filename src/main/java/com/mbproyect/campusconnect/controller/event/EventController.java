@@ -85,13 +85,12 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // This is a temporal version while there is not auth
-    @PostMapping("/participants/{participantId}/{userId}")
+    @PostMapping("/participants/{eventId}")
     public ResponseEntity<EventParticipantResponse> subscribeToEvent(
-            @PathVariable UUID participantId
+            @PathVariable UUID eventId
     ) {
         EventParticipantResponse eventParticipantResponse = eventParticipantService
-                .subscribeToEvent(participantId);
+                .subscribeToEvent(eventId);
         return ResponseEntity.status(HttpStatus.CREATED).body(eventParticipantResponse);
     }
 
@@ -113,8 +112,7 @@ public class EventController {
         return ResponseEntity.noContent().build();
     }
 
-    // This is a temporal version while there is not auth
-    @DeleteMapping("/{eventId}/participants/{userProfileId}")
+    @DeleteMapping("/{eventId}/participants/{eventId}")
     public ResponseEntity<Void> cancelEventSubscription(
             @PathVariable UUID eventId
     ) {
