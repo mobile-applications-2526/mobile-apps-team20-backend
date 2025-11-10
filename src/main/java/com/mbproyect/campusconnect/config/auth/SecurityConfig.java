@@ -1,5 +1,6 @@
 package com.mbproyect.campusconnect.config.auth;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Configuration;
 
 
@@ -8,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -53,6 +55,9 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                ).
+                exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(unauthorizedEntryPoint())
                 )
                 // Adds the JWT filter before the authentication
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -62,6 +67,15 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> null;
+    }
+
+    @Bean
+    public AuthenticationEntryPoint unauthorizedEntryPoint() {
+        return (request, response, authException) -> {
+            response.setContentType("application/json");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Unauthorized or invalid token\"}");
+        };
     }
 
 }
