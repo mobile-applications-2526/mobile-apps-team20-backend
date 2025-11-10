@@ -34,4 +34,6 @@ public class UserProfileRequest {
     @NotNull
     private UserLocation userLocation;
 
+    private byte[] profilePicture;
+
 }

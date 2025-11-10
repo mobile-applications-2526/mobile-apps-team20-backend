@@ -4,7 +4,7 @@ import com.mbproyect.campusconnect.dto.event.request.EventRequest;
 import com.mbproyect.campusconnect.dto.event.response.EventParticipantResponse;
 import com.mbproyect.campusconnect.dto.event.response.EventResponse;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
-
+import com.mbproyect.campusconnect.service.auth.AuthService;
 import com.mbproyect.campusconnect.service.event.EventParticipantService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +12,11 @@ import com.mbproyect.campusconnect.service.event.EventService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 
 import java.time.LocalDateTime;
 import java.util.*;
+
 
 @RestController
 @RequestMapping("/api/events")
@@ -127,4 +129,14 @@ public class EventController {
         eventParticipantService.cancelEventSubscription(eventId);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+    * Get all the events created by a user
+    */
+    @GetMapping("/userCreatedEvents")
+    public ResponseEntity<List<EventResponse>> getMyEvents() {
+        List<EventResponse> responses = eventService.getEventsCreatedByCurrentUser();
+        return ResponseEntity.ok(responses);
+    }
+   
 }

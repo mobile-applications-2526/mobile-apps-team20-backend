@@ -30,6 +30,7 @@ public class UserProfileMapper {
         );
         response.setUserLocation(copyLocation(userProfile.getUserLocation()));
         response.setId(userProfile.getId());
+    response.setProfilePicture(userProfile.getProfilePicture());
 
         return response;
     }
@@ -53,6 +54,7 @@ public class UserProfileMapper {
                 request.getInterests() != null ? new HashSet<>(request.getInterests()) : new HashSet<>()
         );
         userProfile.setUserLocation(copyLocation(request.getUserLocation()));
+        userProfile.setProfilePicture(request.getProfilePicture());
 
         return userProfile;
     }

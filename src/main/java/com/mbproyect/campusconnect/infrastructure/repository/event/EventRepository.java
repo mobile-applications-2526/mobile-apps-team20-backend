@@ -34,4 +34,11 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     Set<Event> getEventsByAnyTag(@Param("tags") Set<InterestTag> tags, @Param("status") EventStatus status);
 
     Event findByEventId(UUID eventId);
+
+    @Query("""
+        SELECT e FROM Event e
+        WHERE e.organiser.userProfile.id = :profileId
+        ORDER BY e.startDate ASC
+    """)
+    List<Event> findEventsByCreator(@Param("profileId") UUID profileId);
 }

@@ -38,4 +38,6 @@ public interface EventService {
      EventResponse updateEvent (@Valid EventRequest eventRequest, @NotNull UUID eventId);
 
      void deleteEvent (@NotNull UUID eventId);
+
+     List<EventResponse> getEventsCreatedByCurrentUser();
 }

@@ -43,4 +43,8 @@ public class UserProfile {
     @Embedded
     private UserLocation userLocation;
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    private byte[] profilePicture;
+
 }

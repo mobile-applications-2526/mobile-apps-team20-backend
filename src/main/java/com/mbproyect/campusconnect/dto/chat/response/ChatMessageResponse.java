@@ -15,6 +15,7 @@ public class ChatMessageResponse {
     private UUID id;
     private UUID senderId;
     private String senderName;
+    private byte[] senderProfilePicture;
     private String content;
     private LocalDateTime sentAt;
 

@@ -1,6 +1,7 @@
 package com.mbproyect.campusconnect.serviceimpl.event;
 
 import com.mbproyect.campusconnect.config.exceptions.event.InvalidDateException;
+import com.mbproyect.campusconnect.config.exceptions.user.UserNotFoundException;
 import com.mbproyect.campusconnect.dto.event.request.EventRequest;
 import com.mbproyect.campusconnect.dto.event.response.EventResponse;
 import com.mbproyect.campusconnect.events.contract.event.EventEventsNotifier;
@@ -10,9 +11,12 @@ import com.mbproyect.campusconnect.infrastructure.mappers.event.EventOrganiserMa
 import com.mbproyect.campusconnect.model.entity.chat.EventChat;
 import com.mbproyect.campusconnect.model.entity.event.Event;
 import com.mbproyect.campusconnect.model.entity.event.EventBio;
+import com.mbproyect.campusconnect.model.entity.event.EventOrganiser;
+import com.mbproyect.campusconnect.model.entity.user.User;
 import com.mbproyect.campusconnect.model.enums.EventStatus;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
 import com.mbproyect.campusconnect.infrastructure.repository.event.EventRepository;
+import com.mbproyect.campusconnect.service.auth.TokenStorageService;
 import com.mbproyect.campusconnect.service.chat.EventChatService;
 import com.mbproyect.campusconnect.service.event.EventService;
 import com.mbproyect.campusconnect.service.user.UserService;
@@ -219,5 +223,22 @@ public class EventServiceImpl implements EventService {
 
         eventsNotifier.onEventCancelled(event);
     }
+    @Override
+    public List<EventResponse> getEventsCreatedByCurrentUser() {
+        String email = userService.getCurrentUser(); // already available pattern
+        User user = userService.findUserByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("No user for token"));
+
+        UUID profileId = user.getUserProfile().getId();
+        List<Event> events = eventRepository.findEventsByCreator(profileId);
+
+        if (events.isEmpty()) {
+            return List.of();
+        }
+
+        return events.stream()
+            .map(EventMapper::toResponse)
+            .toList();
+}
 
 }

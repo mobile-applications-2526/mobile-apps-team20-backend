@@ -81,6 +81,12 @@ public class UserProfileServiceImpl implements UserProfileService {
             changed = true;
         }
 
+        // Profile picture
+        if (!Objects.deepEquals(profile.getProfilePicture(), request.getProfilePicture())) {
+            profile.setProfilePicture(request.getProfilePicture());
+            changed = true;
+        }
+
         if (changed) {
             profile = userProfileRepository.save(profile);
             log.info("Updated user profile {}", userProfileId);

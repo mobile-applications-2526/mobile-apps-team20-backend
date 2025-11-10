@@ -27,4 +27,6 @@ public class UserProfileResponse {
     private Set<InterestTag> interests;
 
     private UserLocation userLocation;
+
+    private byte[] profilePicture;
 }
