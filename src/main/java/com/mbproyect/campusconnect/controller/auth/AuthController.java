@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -25,9 +25,9 @@ public class AuthController {
      *  Returns the refresh token and a header token
      */
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserAuthRequest userAuthRequest) {
-        String response = authService.login(userAuthRequest);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Void> login(@RequestBody UserAuthRequest userAuthRequest) {
+        authService.login(userAuthRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/validate-code")

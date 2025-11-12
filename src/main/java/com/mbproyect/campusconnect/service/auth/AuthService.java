@@ -13,7 +13,7 @@ import org.springframework.validation.annotation.Validated;
 @Service
 public interface AuthService {
 
-    String login(@Valid UserAuthRequest userAuthRequest);
+    void login(@Valid UserAuthRequest userAuthRequest);
 
     void register(@Valid UserAuthRequest userAuthRequest);
 

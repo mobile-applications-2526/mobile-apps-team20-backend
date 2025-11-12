@@ -69,15 +69,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(UserAuthRequest userAuthRequest) {
+    public void login(UserAuthRequest userAuthRequest) {
         // Check if user exists
         User user = userRepository
                 .findByEmail(userAuthRequest.getEmail())
-                .orElseThrow(() ->
-                        new UserNotFoundException(
-                                "Email not found, please register an account first"
-                        )
-                );
+                .orElse(null);
+
+        // Check if the user exists
+        if (user == null) return;
 
         // Generate verification code
         String verificationCode = EncryptionUtil.generateNumericCode(8);
@@ -91,7 +90,6 @@ public class AuthServiceImpl implements AuthService {
 
         // Send email with the token
         userEventsNotifier.onUserLoggedEvent(user.getEmail(), verificationCode);
-        return "If email is registered, you will receive a verification code";
     }
 
     @Override

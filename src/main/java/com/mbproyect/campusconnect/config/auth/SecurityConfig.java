@@ -36,11 +36,11 @@ public class SecurityConfig {
                 .csrf(customizer -> customizer.disable())
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(
-                                "/auth/login",
-                                "/auth/register",
-                                "/auth/validate-code",
-                                "/auth/activate-account",
-                                "/auth/refresh-token",
+                                "/api/auth/login",
+                                "/api/auth/register",
+                                "/api/auth/validate-code",
+                                "/api/auth/activate-account",
+                                "/api/auth/refresh-token",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
