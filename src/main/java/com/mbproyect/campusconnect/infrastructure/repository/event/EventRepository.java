@@ -37,8 +37,8 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
     @Query("""
         SELECT e FROM Event e
-        WHERE e.organiser.userProfile.id = :profileId
+        WHERE e.organiser.userProfile.id = :profileId and e.eventStatus = :status
         ORDER BY e.startDate ASC
     """)
-    List<Event> findEventsByCreator(@Param("profileId") UUID profileId);
+    List<Event> findEventsByCreator(@Param("profileId") UUID profileId, @Param("status") EventStatus status);
 }

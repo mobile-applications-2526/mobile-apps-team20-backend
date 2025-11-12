@@ -237,7 +237,7 @@ public class EventServiceImpl implements EventService {
             .orElseThrow(() -> new UserNotFoundException("No user for token"));
 
         UUID profileId = user.getUserProfile().getId();
-        List<Event> events = eventRepository.findEventsByCreator(profileId);
+        List<Event> events = eventRepository.findEventsByCreator(profileId, EventStatus.ACTIVE);
 
         if (events.isEmpty()) {
             return List.of();
