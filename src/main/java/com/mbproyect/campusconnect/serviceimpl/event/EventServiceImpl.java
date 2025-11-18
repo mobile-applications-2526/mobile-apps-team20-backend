@@ -7,7 +7,6 @@ import com.mbproyect.campusconnect.dto.event.response.EventResponse;
 import com.mbproyect.campusconnect.events.contract.event.EventEventsNotifier;
 import com.mbproyect.campusconnect.infrastructure.mappers.event.EventBioMapper;
 import com.mbproyect.campusconnect.infrastructure.mappers.event.EventMapper;
-import com.mbproyect.campusconnect.infrastructure.mappers.event.EventOrganiserMapper;
 import com.mbproyect.campusconnect.model.entity.chat.EventChat;
 import com.mbproyect.campusconnect.model.entity.event.Event;
 import com.mbproyect.campusconnect.model.entity.event.EventBio;
@@ -16,19 +15,19 @@ import com.mbproyect.campusconnect.model.entity.user.User;
 import com.mbproyect.campusconnect.model.enums.EventStatus;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
 import com.mbproyect.campusconnect.infrastructure.repository.event.EventRepository;
-import com.mbproyect.campusconnect.service.auth.TokenStorageService;
 import com.mbproyect.campusconnect.service.chat.EventChatService;
 import com.mbproyect.campusconnect.service.event.EventOrganiserService;
 import com.mbproyect.campusconnect.service.event.EventService;
 import com.mbproyect.campusconnect.service.user.UserService;
 import com.mbproyect.campusconnect.shared.validation.event.EventValidator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j  // For showing logs
@@ -56,12 +55,10 @@ public class EventServiceImpl implements EventService {
         this.eventOrganiserService = eventOrganiserService;
     }
 
-    private Set<EventResponse> eventSetToResponse (Set<Event> events) {
-        if (events.isEmpty()) return Set.of();
+    private Page<EventResponse> eventPageToResponse(Page<Event> events) {
+        if (events.isEmpty()) return Page.empty();
 
-        return events.stream()
-                .map(EventMapper::toResponse)
-                .collect(Collectors.toSet());
+        return events.map(EventMapper::toResponse);
     }
 
     private void validateEventDate(LocalDateTime start, LocalDateTime end) {
@@ -101,33 +98,50 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Set<EventResponse> getEventsByAnyTag(Set<InterestTag> tags) {
-        Set<Event> events = eventRepository.getEventsByAnyTag(tags, EventStatus.ACTIVE);
+    public Page<EventResponse> getEventsByAnyTag(
+            Set<InterestTag> tags,
+            int page,
+            int size
+    ) {
+        var pageable = PageRequest.of(page, size);
+        Page<Event> events = eventRepository
+                .getEventsByAnyTag(tags, EventStatus.ACTIVE, pageable);
 
         log.info("Returning events with interest tags:  {}", tags);
-        return eventSetToResponse(events);
+        return eventPageToResponse(events);
     }
 
     @Override
-    public List<EventResponse> getEventsByDateAscending(LocalDateTime eventDate) {
-        List<Event> events = eventRepository.getUpcomingEvents(eventDate, EventStatus.ACTIVE);
+    public Page<EventResponse> getEventsByDateAscending(
+            LocalDateTime eventDate,
+            int size,
+            int page
+    ) {
+        var pageable = PageRequest.of(page, size);
+        Page<Event> events = eventRepository
+                .getUpcomingEvents(
+                        eventDate, EventStatus.ACTIVE, pageable
+                );
 
-        if (events.isEmpty()) return List.of();
+        if (events.isEmpty()) return Page.empty();
 
         log.info("Returning events with date:  {}", eventDate);
 
-        return events.stream()
-                .map(EventMapper::toResponse)
-                .toList();
+        return events.map(EventMapper::toResponse);
     }
 
     @Override
-    public Set<EventResponse> getEventsByLocation(String city) {
-        Set<Event> events = eventRepository.findByLocation_City(city);
+    public Page<EventResponse> getEventsByLocation(
+            String city,
+            int page,
+            int size
+    ) {
+        var pageable = PageRequest.of(page, size);
+        Page<Event> events = eventRepository
+                .findByLocation_City(city, EventStatus.ACTIVE, pageable);
 
         log.info("Returning events in {}", city);
-
-        return eventSetToResponse(events);
+        return eventPageToResponse(events);
     }
 
     @Override
@@ -217,7 +231,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void deleteEvent(UUID eventId) {
-        Event event = eventRepository.findByEventId(eventId);
+        Event event = eventRepository.findByEventId(eventId, EventStatus.ACTIVE);
 
         // Validate if current user is the event organiser
         userService.validateCurrentUser(
@@ -231,21 +245,25 @@ public class EventServiceImpl implements EventService {
         eventsNotifier.onEventCancelled(event);
     }
     @Override
-    public List<EventResponse> getEventsCreatedByCurrentUser() {
+    public Page<EventResponse> getEventsCreatedByCurrentUser(
+            int page,
+            int size
+    ) {
+        var pageable = PageRequest.of(page, size);
+
         String email = userService.getCurrentUser(); // already available pattern
         User user = userService.findUserByEmail(email)
             .orElseThrow(() -> new UserNotFoundException("No user for token"));
 
         UUID profileId = user.getUserProfile().getId();
-        List<Event> events = eventRepository.findEventsByCreator(profileId, EventStatus.ACTIVE);
+        Page<Event> events = eventRepository
+                .findEventsByCreator(profileId, EventStatus.ACTIVE, pageable);
 
         if (events.isEmpty()) {
-            return List.of();
+            return Page.empty();
         }
 
-        return events.stream()
-            .map(EventMapper::toResponse)
-            .toList();
+        return events.map(EventMapper::toResponse);
 }
 
 }

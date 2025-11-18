@@ -3,26 +3,40 @@ package com.mbproyect.campusconnect.infrastructure.repository.event;
 import com.mbproyect.campusconnect.model.entity.event.Event;
 import com.mbproyect.campusconnect.model.enums.EventStatus;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {
 
-    Set<Event> findByLocation_City(String locationCity);
+    @Query("""
+        SELECT e FROM Event e
+        WHERE e.location.city = :city
+        AND e.eventStatus = :status
+    """)
+    Page<Event> findByLocation_City(
+           @Param("city") String locationCity,
+           @Param("status") EventStatus status,
+           Pageable pageable
+    );
 
     @Query("SELECT e " +
             "FROM Event e " +
             "WHERE e.startDate >= :date AND e.eventStatus = :status " +
             "ORDER BY e.startDate ASC")
-    List<Event> getUpcomingEvents (@Param("date") LocalDateTime date, @Param("status") EventStatus status);
+    Page<Event> getUpcomingEvents (
+            @Param("date") LocalDateTime date,
+            @Param("status") EventStatus status,
+            Pageable pageable
+    );
 
     @Query("""
         SELECT e FROM Event e
@@ -31,14 +45,29 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         WHERE t IN :tags
         AND e.eventStatus = :status
     """)
-    Set<Event> getEventsByAnyTag(@Param("tags") Set<InterestTag> tags, @Param("status") EventStatus status);
+    Page<Event> getEventsByAnyTag(
+            @Param("tags") Set<InterestTag> tags,
+            @Param("status") EventStatus status,
+            Pageable pageable
+    );
 
-    Event findByEventId(UUID eventId);
+    @Query("""
+        SELECT e FROM Event e
+        WHERE e.eventId = :id and e.eventStatus = :status
+    """)
+    Event findByEventId(
+            @Param("id") UUID eventId,
+            @Param("status")EventStatus status
+    );
 
     @Query("""
         SELECT e FROM Event e
         WHERE e.organiser.userProfile.id = :profileId and e.eventStatus = :status
         ORDER BY e.startDate ASC
     """)
-    List<Event> findEventsByCreator(@Param("profileId") UUID profileId, @Param("status") EventStatus status);
+    Page<Event> findEventsByCreator(
+            @Param("profileId") UUID profileId,
+            @Param("status") EventStatus status,
+            Pageable pageable
+    );
 }

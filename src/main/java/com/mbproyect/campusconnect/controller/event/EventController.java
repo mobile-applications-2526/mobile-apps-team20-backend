@@ -6,6 +6,7 @@ import com.mbproyect.campusconnect.dto.event.response.EventResponse;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
 import com.mbproyect.campusconnect.service.auth.AuthService;
 import com.mbproyect.campusconnect.service.event.EventParticipantService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.mbproyect.campusconnect.service.event.EventService;
@@ -45,8 +46,13 @@ public class EventController {
      * Example: /api/events/by-tag?tags=MUSIC&tags=SPORTS
      */
     @GetMapping("/by-any-tag")
-    public ResponseEntity<Set<EventResponse>> getEventsByAnyTag(@RequestParam Set<InterestTag> tags) {
-        Set<EventResponse> responses = eventService.getEventsByAnyTag(tags);
+    public ResponseEntity<Page<EventResponse>> getEventsByAnyTag(
+            @RequestParam Set<InterestTag> tags,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        Page<EventResponse> responses = eventService
+                .getEventsByAnyTag(tags, page, size);
         return ResponseEntity.ok(responses);
     }
 
@@ -55,8 +61,13 @@ public class EventController {
      * Example: /api/events/by-date?eventDate=2025-10-15
      */
     @GetMapping("/by-date")
-    public ResponseEntity<List<EventResponse>> getEventsByDateAscending(@RequestParam LocalDateTime eventDate) {
-        List<EventResponse> responses = eventService.getEventsByDateAscending(eventDate);
+    public ResponseEntity<Page<EventResponse>> getEventsByDateAscending(
+            @RequestParam LocalDateTime eventDate,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        Page<EventResponse> responses = eventService
+                .getEventsByDateAscending(eventDate, page, size);
         return ResponseEntity.ok(responses);
     }
 
@@ -65,24 +76,32 @@ public class EventController {
      * Example: /api/events/by-location?city=Leuven
      */
     @GetMapping("/by-location")
-    public ResponseEntity<Set<EventResponse>> getEventsByLocation(
-            @RequestParam String city
+    public ResponseEntity<Page<EventResponse>> getEventsByLocation(
+            @RequestParam String city,
+            @RequestParam int page,
+            @RequestParam int size
     ) {
-        Set<EventResponse> responses = eventService.getEventsByLocation(city);
+        Page<EventResponse> responses = eventService
+                .getEventsByLocation(city, page, size);
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{eventId}/participants")
-    public ResponseEntity<Set<EventParticipantResponse>> getEventParticipants(
-            @PathVariable UUID eventId
+    public ResponseEntity<Page<EventParticipantResponse>> getEventParticipants(
+            @PathVariable UUID eventId,
+            @RequestParam int page,
+            @RequestParam int size
     ) {
-        return ResponseEntity.ok(eventParticipantService.getParticipantsByEvent(eventId));
+        return ResponseEntity.ok(
+                eventParticipantService
+                        .getParticipantsByEvent(eventId, page, size)
+        );
     }
 
     // TODO: Implement this by looking if the user who sends the token is a eventId participant
 //    @GetMapping("/chat/{eventId}/")
-//    public ResponseEntity<Set<EventParticipantResponse>> getChatId(
-//            @PathVariable UUID eventId
+//    public ResponseEntity<UUID> getChatId(
+//            @PathVariable UUID eventId,
 //    ) {
 //        return ResponseEntity.ok(eventParticipantService.getChatId(eventId));
 //    }
@@ -134,8 +153,12 @@ public class EventController {
     * Get all the events created by a user
     */
     @GetMapping("/userCreatedEvents")
-    public ResponseEntity<List<EventResponse>> getMyEvents() {
-        List<EventResponse> responses = eventService.getEventsCreatedByCurrentUser();
+    public ResponseEntity<Page<EventResponse>> getMyEvents(
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        Page<EventResponse> responses = eventService
+                .getEventsCreatedByCurrentUser(page, size);
         return ResponseEntity.ok(responses);
     }
    

@@ -10,19 +10,17 @@ import com.mbproyect.campusconnect.infrastructure.repository.user.UserRepository
 import com.mbproyect.campusconnect.model.entity.event.Event;
 import com.mbproyect.campusconnect.model.entity.event.EventParticipant;
 import com.mbproyect.campusconnect.model.entity.user.User;
-import com.mbproyect.campusconnect.model.enums.EventStatus;
 import com.mbproyect.campusconnect.service.event.EventParticipantService;
 import com.mbproyect.campusconnect.service.user.UserService;
 import com.mbproyect.campusconnect.shared.validation.event.EventValidator;
 import com.mbproyect.campusconnect.shared.validation.user.UserValidator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -52,22 +50,26 @@ public class EventParticipantServiceImpl implements EventParticipantService {
     }
 
     @Override
-    public Set<EventParticipantResponse> getParticipantsByEvent(UUID eventId) {
+    public Page<EventParticipantResponse> getParticipantsByEvent(
+            UUID eventId,
+            int page, int size
+    ) {
         // If event do not exist, it throws a not found exception
         Event event = eventValidator.validateEventExists(eventId);
 
-        if (event.getEventStatus().equals(EventStatus.CANCELLED)) {
-            throw new EventCancelledException("Event with id " + eventId + "is cancelled");
+        if (event == null) {
+            throw new EventNotFoundException("Event with id " + eventId + "not found");
         }
 
-        Set<EventParticipant> participants = event.getParticipants();
+        var pageable = PageRequest.of(page, size);
+        Page<EventParticipant> participants = eventParticipantRepository
+                .findEventParticipantsByEvent(event, pageable);
 
         // Returns an empty set
-        if (participants.isEmpty()) return Set.of();
+        if (participants.isEmpty()) return Page.empty();
 
-        return participants.stream()
-                .map(EventParticipantMapper::toResponse) // Call method reference
-                .collect(Collectors.toSet());           // Transforms stream to a set
+        return participants
+                .map(EventParticipantMapper::toResponse); // Call method reference
     }
 
     @Override
