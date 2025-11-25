@@ -41,6 +41,7 @@ public class SecurityConfig {
                                 "/api/auth/validate-code",
                                 "/api/auth/activate-account",
                                 "/api/auth/refresh-token",
+                                "/api/auth/google",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",

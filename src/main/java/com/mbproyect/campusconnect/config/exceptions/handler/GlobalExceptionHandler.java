@@ -3,9 +3,10 @@ package com.mbproyect.campusconnect.config.exceptions.handler;
 
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.mbproyect.campusconnect.config.exceptions.auth.InvalidGoogleTokenException;
 import com.mbproyect.campusconnect.config.exceptions.chat.ChatNotFoundException;
 import com.mbproyect.campusconnect.config.exceptions.event.*;
-import com.mbproyect.campusconnect.config.exceptions.user.InvalidTokenException;
+import com.mbproyect.campusconnect.config.exceptions.auth.InvalidTokenException;
 import com.mbproyect.campusconnect.config.exceptions.user.UserAlreadyExistsException;
 import com.mbproyect.campusconnect.config.exceptions.user.UserNotFoundException;
 import jakarta.validation.ConstraintViolationException;
@@ -55,6 +56,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             BadCredentialsException.class,
+            InvalidGoogleTokenException.class
     })
     public ResponseEntity<ErrorResponse> handleAuthenticationException(RuntimeException exception, WebRequest request) {
         return createErrorResponseEntity(exception, request, HttpStatus.UNAUTHORIZED);

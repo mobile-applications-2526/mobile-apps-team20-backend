@@ -1,10 +1,11 @@
 package com.mbproyect.campusconnect.serviceimpl.auth;
 
-import com.mbproyect.campusconnect.config.exceptions.user.InvalidTokenException;
+import com.mbproyect.campusconnect.config.exceptions.auth.InvalidTokenException;
 import com.mbproyect.campusconnect.config.exceptions.user.UserAlreadyExistsException;
-import com.mbproyect.campusconnect.config.exceptions.user.UserNotFoundException;
 import com.mbproyect.campusconnect.dto.auth.request.RefreshTokenRequest;
+import com.mbproyect.campusconnect.dto.auth.request.TokenRequest;
 import com.mbproyect.campusconnect.dto.auth.request.UserAuthRequest;
+import com.mbproyect.campusconnect.dto.auth.response.TokenResponse;
 import com.mbproyect.campusconnect.dto.auth.response.UserAuthenticationResponse;
 import com.mbproyect.campusconnect.events.contract.user.UserEventsNotifier;
 import com.mbproyect.campusconnect.infrastructure.repository.user.UserRepository;
@@ -12,6 +13,7 @@ import com.mbproyect.campusconnect.model.entity.user.User;
 import com.mbproyect.campusconnect.model.enums.TokenType;
 import com.mbproyect.campusconnect.service.auth.AuthService;
 import com.mbproyect.campusconnect.service.auth.JwtService;
+import com.mbproyect.campusconnect.service.auth.ExternalAuthService;
 import com.mbproyect.campusconnect.service.auth.TokenStorageService;
 import com.mbproyect.campusconnect.service.user.UserService;
 import com.mbproyect.campusconnect.shared.util.EncryptionUtil;
@@ -37,6 +39,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserService userService;
 
+    private final ExternalAuthService externalAuthService;
+
     @Value("${app.activate.link}")
     private String baseUrl;
 
@@ -45,12 +49,14 @@ public class AuthServiceImpl implements AuthService {
             TokenStorageService tokenStorageService,
             UserEventsNotifier userEventsNotifier,
             JwtService jwtService,
-            UserService userService) {
+            UserService userService,
+            ExternalAuthService externalAuthService) {
         this.userRepository = userRepository;
         this.tokenStorageService = tokenStorageService;
         this.userEventsNotifier = userEventsNotifier;
         this.jwtService = jwtService;
         this.userService = userService;
+        this.externalAuthService = externalAuthService;
     }
 
     private void validateToken (TokenType tokenType, String email, String token) {
@@ -146,6 +152,23 @@ public class AuthServiceImpl implements AuthService {
 
         // Token is valid so we register the user
         userService.createUser(email);
+    }
+
+    @Override
+    public TokenResponse tokenAuthentication(TokenRequest request) {
+        // Validate token
+        String email = externalAuthService.verifyToken(request);
+
+        // Check if user already exists
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isEmpty()) {
+            userService.createUser(email);
+        }
+
+        // Generate access token
+        String accessToken = jwtService.generateToken(email);
+        return new TokenResponse(accessToken);
     }
 
     @Override

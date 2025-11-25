@@ -1,13 +1,17 @@
 package com.mbproyect.campusconnect.controller.auth;
 
 import com.mbproyect.campusconnect.dto.auth.request.RefreshTokenRequest;
+import com.mbproyect.campusconnect.dto.auth.request.TokenRequest;
 import com.mbproyect.campusconnect.dto.auth.request.UserAuthRequest;
+import com.mbproyect.campusconnect.dto.auth.response.TokenResponse;
 import com.mbproyect.campusconnect.dto.auth.response.UserAuthenticationResponse;
 import com.mbproyect.campusconnect.service.auth.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.UUID;
 
 @RestController
@@ -28,6 +32,12 @@ public class AuthController {
     public ResponseEntity<Void> login(@RequestBody UserAuthRequest userAuthRequest) {
         authService.login(userAuthRequest);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<TokenResponse> tokenAuthentication(@RequestBody TokenRequest request) {
+        TokenResponse response = authService.tokenAuthentication(request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/validate-code")

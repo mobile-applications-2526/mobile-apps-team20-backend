@@ -1,7 +1,9 @@
 package com.mbproyect.campusconnect.service.auth;
 
 import com.mbproyect.campusconnect.dto.auth.request.RefreshTokenRequest;
+import com.mbproyect.campusconnect.dto.auth.request.TokenRequest;
 import com.mbproyect.campusconnect.dto.auth.request.UserAuthRequest;
+import com.mbproyect.campusconnect.dto.auth.response.TokenResponse;
 import com.mbproyect.campusconnect.dto.auth.response.UserAuthenticationResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -27,6 +29,7 @@ public interface AuthService {
             @NotBlank String email
     );
 
+    TokenResponse tokenAuthentication (@Valid TokenRequest request);
     UserAuthenticationResponse refreshToken(@Valid RefreshTokenRequest request);
 
     void logout(HttpServletRequest request);
