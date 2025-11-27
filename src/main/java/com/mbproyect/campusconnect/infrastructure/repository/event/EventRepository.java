@@ -21,20 +21,26 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         SELECT e FROM Event e
         WHERE e.location.city = :city
         AND e.eventStatus = :status
+        AND e.organiser.email <> :excludedEmail
     """)
     Page<Event> findByLocation_City(
-           @Param("city") String locationCity,
-           @Param("status") EventStatus status,
-           Pageable pageable
+            @Param("city") String locationCity,
+            @Param("status") EventStatus status,
+            @Param("excludedEmail") String excludedEmail,
+            Pageable pageable
     );
 
-    @Query("SELECT e " +
-            "FROM Event e " +
-            "WHERE e.startDate >= :date AND e.eventStatus = :status " +
-            "ORDER BY e.startDate ASC")
+    @Query("""
+        SELECT e FROM Event e 
+        WHERE e.startDate >= :date 
+        AND e.eventStatus = :status 
+        AND e.organiser.email <> :excludedEmail
+        ORDER BY e.startDate ASC
+    """)
     Page<Event> getUpcomingEvents (
             @Param("date") LocalDateTime date,
             @Param("status") EventStatus status,
+            @Param("excludedEmail") String excludedEmail,
             Pageable pageable
     );
 
@@ -44,10 +50,12 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         JOIN b.interestTags t
         WHERE t IN :tags
         AND e.eventStatus = :status
+        AND e.organiser.email <> :excludedEmail
     """)
     Page<Event> getEventsByAnyTag(
             @Param("tags") Set<InterestTag> tags,
             @Param("status") EventStatus status,
+            @Param("excludedEmail") String excludedEmail,
             Pageable pageable
     );
 
@@ -57,7 +65,7 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     """)
     Event findByEventId(
             @Param("id") UUID eventId,
-            @Param("status")EventStatus status
+            @Param("status") EventStatus status
     );
 
     @Query("""
@@ -68,6 +76,40 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     Page<Event> findEventsByCreator(
             @Param("profileId") UUID profileId,
             @Param("status") EventStatus status,
+            Pageable pageable
+    );
+
+    @Query("""
+        SELECT e FROM Event e
+        JOIN e.eventBio b
+        JOIN b.interestTags t
+        WHERE e.location.city = :city
+        AND t IN :tags
+        AND e.eventStatus = :status
+        AND e.organiser.email <> :excludedEmail
+    """)
+    Page<Event> findByLocation_CityAndEventBio_InterestTags(
+            @Param("city") String locationCity,
+            @Param("tags") Set<InterestTag> eventBioInterestTags,
+            @Param("status") EventStatus status,
+            @Param("excludedEmail") String excludedEmail,
+            Pageable pageable
+    );
+
+    @Query("""
+        SELECT e FROM Event e
+        JOIN e.eventBio b
+        JOIN b.interestTags t
+        WHERE e.startDate = :date
+        AND t IN :tags
+        AND e.eventStatus = :status
+        AND e.organiser.email <> :excludedEmail
+    """)
+    Page<Event> findByStartDateAndEventBio_InterestTags(
+            @Param("date") LocalDateTime startDate,
+            @Param("tags") Set<InterestTag> eventBioInterestTags,
+            @Param("status") EventStatus status,
+            @Param("excludedEmail") String excludedEmail,
             Pageable pageable
     );
 }

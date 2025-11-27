@@ -23,6 +23,7 @@ import com.mbproyect.campusconnect.shared.validation.event.EventValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -104,8 +105,10 @@ public class EventServiceImpl implements EventService {
             int size
     ) {
         var pageable = PageRequest.of(page, size);
+        String currentUserEmail = userService.getCurrentUser();
+
         Page<Event> events = eventRepository
-                .getEventsByAnyTag(tags, EventStatus.ACTIVE, pageable);
+                .getEventsByAnyTag(tags, EventStatus.ACTIVE, currentUserEmail, pageable);
 
         log.info("Returning events with interest tags:  {}", tags);
         return eventPageToResponse(events);
@@ -118,9 +121,11 @@ public class EventServiceImpl implements EventService {
             int page
     ) {
         var pageable = PageRequest.of(page, size);
+        String currentUserEmail = userService.getCurrentUser();
+
         Page<Event> events = eventRepository
                 .getUpcomingEvents(
-                        eventDate, EventStatus.ACTIVE, pageable
+                        eventDate, EventStatus.ACTIVE, currentUserEmail, pageable
                 );
 
         if (events.isEmpty()) return Page.empty();
@@ -137,10 +142,59 @@ public class EventServiceImpl implements EventService {
             int size
     ) {
         var pageable = PageRequest.of(page, size);
+        String currentUserEmail = userService.getCurrentUser();
+
         Page<Event> events = eventRepository
-                .findByLocation_City(city, EventStatus.ACTIVE, pageable);
+                .findByLocation_City(city, EventStatus.ACTIVE, currentUserEmail, pageable);
 
         log.info("Returning events in {}", city);
+        return eventPageToResponse(events);
+    }
+
+    @Override
+    public Page<EventResponse> getEventsByLocationAndInterestTag(
+            String city,
+            Set<InterestTag> tags,
+            int page,
+            int size
+    ) {
+        var pageable = PageRequest.of(page, size);
+        String currentUserEmail = userService.getCurrentUser();
+
+        Page<Event> events = eventRepository
+                .findByLocation_CityAndEventBio_InterestTags(
+                        city,
+                        tags,
+                        EventStatus.ACTIVE,
+                        currentUserEmail,
+                        pageable
+                );
+
+        log.info("Returning events in {}, with interests: {}", city, tags);
+        return eventPageToResponse(events);
+    }
+
+    @Override
+    public Page<EventResponse> getEventsByDateAndInterestTag(
+            LocalDateTime startDate,
+            Set<InterestTag> tags,
+            int page,
+            int size
+    ) {
+        // Updated to include sort by StartDate Ascending
+        var pageable = PageRequest.of(page, size, Sort.by("startDate").ascending());
+        String currentUserEmail = userService.getCurrentUser();
+
+        Page<Event> events = eventRepository
+                .findByStartDateAndEventBio_InterestTags(
+                        startDate,
+                        tags,
+                        EventStatus.ACTIVE,
+                        currentUserEmail,
+                        pageable
+                );
+
+        log.info("Returning events the {}, with interests: {}", startDate, tags);
         return eventPageToResponse(events);
     }
 
@@ -253,7 +307,7 @@ public class EventServiceImpl implements EventService {
 
         String email = userService.getCurrentUser(); // already available pattern
         User user = userService.findUserByEmail(email)
-            .orElseThrow(() -> new UserNotFoundException("No user for token"));
+                .orElseThrow(() -> new UserNotFoundException("No user for token"));
 
         UUID profileId = user.getUserProfile().getId();
         Page<Event> events = eventRepository
@@ -264,6 +318,5 @@ public class EventServiceImpl implements EventService {
         }
 
         return events.map(EventMapper::toResponse);
-}
-
+    }
 }

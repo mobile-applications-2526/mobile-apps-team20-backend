@@ -46,6 +46,20 @@ public interface EventService {
              @Min(1) @Max(50) int size
      );
 
+     Page<EventResponse> getEventsByLocationAndInterestTag(
+             @NotBlank String city,
+             @NotNull Set<InterestTag> tags,
+             @Min(0) int page,
+             @Min(1) @Max(50) int size
+     );
+
+     Page<EventResponse> getEventsByDateAndInterestTag(
+             @NotBlank LocalDateTime startDate,
+             @NotNull Set<InterestTag> tags,
+             @Min(0) int page,
+             @Min(1) @Max(50) int size
+     );
+
      EventResponse createEvent (@Valid EventRequest eventRequest);
 
      EventResponse updateEvent (@Valid EventRequest eventRequest, @NotNull UUID eventId);

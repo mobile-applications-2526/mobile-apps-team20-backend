@@ -4,7 +4,6 @@ import com.mbproyect.campusconnect.dto.event.request.EventRequest;
 import com.mbproyect.campusconnect.dto.event.response.EventParticipantResponse;
 import com.mbproyect.campusconnect.dto.event.response.EventResponse;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
-import com.mbproyect.campusconnect.service.auth.AuthService;
 import com.mbproyect.campusconnect.service.event.EventParticipantService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,6 @@ import com.mbproyect.campusconnect.service.event.EventService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -68,6 +66,40 @@ public class EventController {
     ) {
         Page<EventResponse> responses = eventService
                 .getEventsByDateAscending(eventDate, page, size);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/by-date-and-interests")
+    public ResponseEntity<Page<EventResponse>> getEventsByDateAndInterestTags(
+            @RequestParam LocalDateTime eventDate,
+            @RequestParam Set<InterestTag> tags,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        Page<EventResponse> responses = eventService
+                .getEventsByDateAndInterestTag(
+                        eventDate,
+                        tags,
+                        page,
+                        size
+                );
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/by-location-and-interests")
+    public ResponseEntity<Page<EventResponse>> getEventsByLocationAndInterestTags(
+            @RequestParam String city,
+            @RequestParam Set<InterestTag> tags,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        Page<EventResponse> responses = eventService
+                .getEventsByLocationAndInterestTag(
+                        city,
+                        tags,
+                        page,
+                        size
+                );
         return ResponseEntity.ok(responses);
     }
 
