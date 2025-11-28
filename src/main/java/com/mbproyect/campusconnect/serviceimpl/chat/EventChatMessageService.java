@@ -17,6 +17,7 @@ import com.mbproyect.campusconnect.service.chat.ChatMessageService;
 import com.mbproyect.campusconnect.service.event.EventService;
 import com.mbproyect.campusconnect.service.user.UserService;
 import com.mbproyect.campusconnect.shared.util.EncryptionUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@Slf4j
 @Service("eventChatMessageService")
 public class EventChatMessageService implements ChatMessageService {
 
@@ -59,6 +61,7 @@ public class EventChatMessageService implements ChatMessageService {
         String currentUserEmail = userService.getCurrentUser();
 
         if (!isUserAuthorized(currentUserEmail, eventId)) {
+            log.warn("User not authorized");
             throw new IllegalStateException("Unauthorized action");
         }
 
@@ -69,9 +72,11 @@ public class EventChatMessageService implements ChatMessageService {
     @Override
     public ChatMessageResponse sendMessage(ChatMessageRequest chatMessageRequest, UUID chatId) {
 
+        log.info("Sending chat message");
         EventChat eventChat = chatRepository.findEventChatById(chatId);
 
         if (eventChat == null) {
+            log.warn("Event chat not found");
             throw new ChatNotFoundException("The id does not match with any chat");
         }
 
@@ -89,6 +94,8 @@ public class EventChatMessageService implements ChatMessageService {
         var savedMessage = chatMessageRepository.save(message);
         String decryptedContent = encryptionUtil
                 .decrypt(savedMessage.getEncryptedText());
+
+        log.info("Chat message sent");
 
         return ChatMessageMapper
                 .toResponse(savedMessage, decryptedContent, sender.getUserId());

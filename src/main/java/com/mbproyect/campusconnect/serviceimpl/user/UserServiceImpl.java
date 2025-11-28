@@ -13,6 +13,7 @@ import com.mbproyect.campusconnect.model.entity.user.UserProfile;
 import com.mbproyect.campusconnect.model.enums.EventStatus;
 import com.mbproyect.campusconnect.service.user.UserService;
 import com.mbproyect.campusconnect.shared.util.EncryptionUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.query.NativeQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -71,14 +73,16 @@ public class UserServiceImpl implements UserService {
         User actualUser = this.findUserByEmail(userEmail)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        var sort = Sort.by(Sort.Direction.DESC, "messages.sentAt");
-        var pageable = PageRequest.of(page, size, sort);
+        // var sort = Sort.by(Sort.Direction.DESC, "messages.sentAt");
+        var pageable = PageRequest.of(page, size);
 
         Page<EventChat> chats = chatRepository.getUserChats(
                 userEmail,
                 EventStatus.ACTIVE,
                 pageable
         );
+
+        log.info("Returning user chats");
 
         if (chats.isEmpty()) {
             return Page.empty();

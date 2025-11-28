@@ -40,6 +40,7 @@ public class ChatMapper {
         return new EventChatResponse(
                 chat.getId(),
                 chat.getEvent() != null ? chat.getEvent().getEventId() : null,
+                chat.getEvent() != null ? chat.getEvent().getName() : null,
                 lastMessageResponse,
                 eventImage
         );

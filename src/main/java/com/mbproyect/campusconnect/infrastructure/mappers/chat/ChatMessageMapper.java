@@ -7,6 +7,7 @@ import com.mbproyect.campusconnect.model.entity.user.UserProfile;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.UUID;
 
 @Component
@@ -32,7 +33,7 @@ public class ChatMessageMapper {
         entity.getId(),
         entity.getSender().getId(),
         entity.getSender().getUserName(),
-        Arrays.toString(entity.getSender().getProfilePicture()),
+            Base64.getEncoder().encodeToString(entity.getSender().getProfilePicture()),
         decryptedText,
         entity.getSentAt(),
         actualUserId.equals(entity.getSender().getId())

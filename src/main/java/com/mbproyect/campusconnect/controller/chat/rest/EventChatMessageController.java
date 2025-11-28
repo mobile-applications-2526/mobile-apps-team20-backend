@@ -1,7 +1,7 @@
 package com.mbproyect.campusconnect.controller.chat.rest;
 
 import com.mbproyect.campusconnect.dto.chat.response.ChatMessageResponse;
-import com.mbproyect.campusconnect.serviceimpl.chat.EventChatMessageService;
+import com.mbproyect.campusconnect.service.chat.ChatMessageService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,10 +13,10 @@ import java.util.UUID;
 @RestController("/api/chat")
 public class EventChatMessageController {
 
-    private final EventChatMessageService eventChatMessageService;
+    private final ChatMessageService chatMessageService;
 
-    public EventChatMessageController(EventChatMessageService eventChatMessageService) {
-        this.eventChatMessageService = eventChatMessageService;
+    public EventChatMessageController(ChatMessageService eventChatMessageService) {
+        this.chatMessageService = eventChatMessageService;
     }
 
     // Get messages from a chat
@@ -26,7 +26,7 @@ public class EventChatMessageController {
             int page,
             int size
     ) {
-        return ResponseEntity.ok(eventChatMessageService
+        return ResponseEntity.ok(chatMessageService
                 .getMessages(chatId, page, size));
     }
 

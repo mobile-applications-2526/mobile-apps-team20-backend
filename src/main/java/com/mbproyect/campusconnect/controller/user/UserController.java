@@ -1,6 +1,5 @@
 package com.mbproyect.campusconnect.controller.user;
 
-import com.mbproyect.campusconnect.dto.chat.response.ChatMessageResponse;
 import com.mbproyect.campusconnect.dto.chat.response.EventChatResponse;
 import com.mbproyect.campusconnect.dto.user.request.UserProfileRequest;
 import com.mbproyect.campusconnect.dto.user.response.UserProfileResponse;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 @Slf4j
 public class UserController {
 
