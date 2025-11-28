@@ -130,14 +130,6 @@ public class EventController {
         );
     }
 
-    // TODO: Implement this by looking if the user who sends the token is a eventId participant
-//    @GetMapping("/chat/{eventId}/")
-//    public ResponseEntity<UUID> getChatId(
-//            @PathVariable UUID eventId,
-//    ) {
-//        return ResponseEntity.ok(eventParticipantService.getChatId(eventId));
-//    }
-
     @PostMapping
     public ResponseEntity<EventResponse> createEvent(
             @Valid @RequestBody EventRequest eventRequest

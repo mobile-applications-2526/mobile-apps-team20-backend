@@ -1,13 +1,11 @@
 package com.mbproyect.campusconnect.dto.event.response;
 
-import com.mbproyect.campusconnect.dto.chat.response.EventChatResponse;
 import com.mbproyect.campusconnect.model.entity.event.EventLocation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -24,8 +22,6 @@ public class EventResponse {
     private EventOrganiserResponse organiser;
 
     private EventLocation location;
-
-    private EventChatResponse chat;
 
     private long participantCount;
 

@@ -13,4 +13,10 @@ public class EventChatResponse {
 
     private UUID id;
 
+    private UUID eventId;
+
+    private ChatMessageResponse lastMessage;
+
+    private String eventImage;
+    
 }

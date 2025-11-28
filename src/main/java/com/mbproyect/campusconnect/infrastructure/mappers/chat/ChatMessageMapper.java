@@ -6,6 +6,9 @@ import com.mbproyect.campusconnect.model.entity.chat.EventChat;
 import com.mbproyect.campusconnect.model.entity.user.UserProfile;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.UUID;
+
 @Component
 public class ChatMessageMapper {
 
@@ -20,14 +23,19 @@ public class ChatMessageMapper {
     }
 
 
-    static public ChatMessageResponse toResponse(ChatMessage entity, String decryptedText) {
+    static public ChatMessageResponse toResponse(
+            ChatMessage entity,
+            String decryptedText,
+            UUID actualUserId
+    ) {
     return new ChatMessageResponse(
         entity.getId(),
         entity.getSender().getId(),
         entity.getSender().getUserName(),
-        entity.getSender().getProfilePicture(),
+        Arrays.toString(entity.getSender().getProfilePicture()),
         decryptedText,
-        entity.getSentAt()
+        entity.getSentAt(),
+        actualUserId.equals(entity.getSender().getId())
     );
     }
 }
