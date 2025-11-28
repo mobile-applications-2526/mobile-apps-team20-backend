@@ -60,6 +60,11 @@ public interface EventService {
              @Min(1) @Max(50) int size
      );
 
+     boolean doesUserBelongsToEvent(
+             @NotBlank String email,
+             @NotBlank UUID eventId
+     );
+
      EventResponse createEvent (@Valid EventRequest eventRequest);
 
      EventResponse updateEvent (@Valid EventRequest eventRequest, @NotNull UUID eventId);

@@ -112,4 +112,19 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             @Param("excludedEmail") String excludedEmail,
             Pageable pageable
     );
+
+    @Query("""
+        SELECT COUNT(e) > 0
+        FROM Event e
+        LEFT JOIN e.participants p
+        WHERE e.eventId = :eventId
+        AND e.eventStatus = :status
+        AND (e.organiser.email = :email OR p.email = :email)
+    """)
+    boolean isUserInEvent(
+            @Param("email") String email,
+            @Param("eventId") UUID eventId,
+            @Param("status") EventStatus status
+    );
+
 }

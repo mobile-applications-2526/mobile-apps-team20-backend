@@ -1,5 +1,6 @@
 package com.mbproyect.campusconnect.serviceimpl.event;
 
+import com.mbproyect.campusconnect.config.exceptions.event.EventNotFoundException;
 import com.mbproyect.campusconnect.config.exceptions.event.InvalidDateException;
 import com.mbproyect.campusconnect.config.exceptions.user.UserNotFoundException;
 import com.mbproyect.campusconnect.dto.event.request.EventRequest;
@@ -196,6 +197,15 @@ public class EventServiceImpl implements EventService {
 
         log.info("Returning events the {}, with interests: {}", startDate, tags);
         return eventPageToResponse(events);
+    }
+
+    @Override
+    public boolean doesUserBelongsToEvent(String email, UUID eventId) {
+        if (!eventRepository.existsById(eventId)) {
+            throw new EventNotFoundException("Event not found");
+        }
+
+        return eventRepository.isUserInEvent(email, eventId, EventStatus.ACTIVE);
     }
 
     @Override
