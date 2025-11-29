@@ -111,3 +111,96 @@ CREATE TABLE chat_message (
                               FOREIGN KEY (chat_id) REFERENCES event_chat(id) ON DELETE CASCADE,
                               FOREIGN KEY (sender_id) REFERENCES user_profile(id)
 );
+
+
+-- =============================================
+-- 1. INSERT PROFILES (Alice & Bob)
+-- =============================================
+INSERT INTO user_profile (id, user_name, age, nationality, profile_picture, city, country)
+VALUES
+    ('a0000000-0000-0000-0000-000000000001', 'alice_wonder', 28, 'USA', NULL, 'New York', 'USA'),
+    ('b0000000-0000-0000-0000-000000000002', 'bob_builder', 32, 'UK', NULL, 'London', 'UK');
+
+INSERT INTO user_languages (user_profile_id, language) VALUES
+                                                           ('a0000000-0000-0000-0000-000000000001', 'English'),
+                                                           ('a0000000-0000-0000-0000-000000000001', 'Spanish'),
+                                                           ('b0000000-0000-0000-0000-000000000002', 'English');
+
+INSERT INTO user_bio_tags (user_bio_id, tag) VALUES
+                                                 ('a0000000-0000-0000-0000-000000000001', 'CODING'),
+                                                 ('b0000000-0000-0000-0000-000000000002', 'SPORTS');
+
+-- =============================================
+-- 2. INSERT USERS
+-- =============================================
+INSERT INTO users (user_id, email, is_active, user_profile_id)
+VALUES
+    ('10000000-0000-0000-0000-000000000001', 'alice@example.com', true, 'a0000000-0000-0000-0000-000000000001'),
+    ('10000000-0000-0000-0000-000000000002', 'bob@example.com', true, 'b0000000-0000-0000-0000-000000000002');
+
+-- =============================================
+-- 3. INSERT ORGANISER
+-- =============================================
+INSERT INTO event_organiser (id, email, user_profile_id)
+VALUES
+    ('90000000-0000-0000-0000-000000000001', 'alice@example.com', 'a0000000-0000-0000-0000-000000000001');
+
+-- =============================================
+-- 4. INSERT EVENT BIO & EVENT
+-- =============================================
+INSERT INTO event_bio (id, description, image)
+VALUES
+    ('eb000000-0000-0000-0000-000000000001', 'A cool tech meetup for developers', NULL);
+
+INSERT INTO event_bio_tags (event_bio_id, tag) VALUES
+    ('eb000000-0000-0000-0000-000000000001', 'TECHNOLOGY');
+
+INSERT INTO event (event_id, name, start_date, end_date, event_status, city, place_name, event_bio_id, organiser_id)
+VALUES
+    (
+        'e0000000-0000-0000-0000-000000000001',
+        'Campus Tech Talk',
+        '2025-12-01 10:00:00',
+        '2025-12-01 12:00:00',
+        'ACTIVE',
+        'Leuven',
+        'Conference Hall A',
+        'eb000000-0000-0000-0000-000000000001',
+        '90000000-0000-0000-0000-000000000001'
+    );
+
+-- =============================================
+-- 5. INSERT PARTICIPANT
+-- =============================================
+INSERT INTO event_participant (id, email, user_profile_id, event_id)
+VALUES
+    (
+        '70000000-0000-0000-0000-000000000001',
+        'bob@example.com',
+        'b0000000-0000-0000-0000-000000000002',
+        'e0000000-0000-0000-0000-000000000001'
+    );
+
+-- =============================================
+-- 6. INSERT CHAT & MESSAGES
+-- =============================================
+INSERT INTO event_chat (id, event_id)
+VALUES
+    ('c0000000-0000-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000001');
+
+INSERT INTO chat_message (id, encrypted_text, sent_at, chat_id, sender_id)
+VALUES
+    (
+        '30000000-0000-0000-0000-000000000001',
+        'Hello everyone!',
+        '2025-12-01 09:55:00',
+        'c0000000-0000-0000-0000-000000000001',
+        'a0000000-0000-0000-0000-000000000001'
+    ),
+    (
+        '30000000-0000-0000-0000-000000000002',
+        'Hi Alice, excited to be here!',
+        '2025-12-01 09:56:00',
+        'c0000000-0000-0000-0000-000000000001',
+        'b0000000-0000-0000-0000-000000000002'
+    );

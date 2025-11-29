@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ToDoApp
+      POSTGRES_DB: CampusConnect
     labels:
       - "org.springframework.boot.service-connection=postgres"
     ports:

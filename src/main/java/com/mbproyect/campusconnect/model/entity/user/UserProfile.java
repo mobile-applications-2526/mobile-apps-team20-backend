@@ -3,7 +3,9 @@ package com.mbproyect.campusconnect.model.entity.user;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 
+import java.sql.Types;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,6 +47,7 @@ public class UserProfile {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
+    @JdbcTypeCode(Types.VARBINARY)
     private byte[] profilePicture;
 
 }
