@@ -1,120 +1,113 @@
--- ======================================
--- DROP DEPENDENT TABLES FIRST (optional for full reset)
--- ======================================
--- DROP TABLE IF EXISTS chat_message CASCADE;
--- DROP TABLE IF EXISTS event_chat CASCADE;
--- DROP TABLE IF EXISTS event_participant CASCADE;
--- DROP TABLE IF EXISTS event_bio_tags CASCADE;
--- DROP TABLE IF EXISTS user_bio_tags CASCADE;
--- DROP TABLE IF EXISTS user_languages CASCADE;
--- DROP TABLE IF EXISTS event_organiser_events CASCADE;
--- DROP TABLE IF EXISTS event CASCADE;
--- DROP TABLE IF EXISTS event_bio CASCADE;
--- DROP TABLE IF EXISTS event_organiser CASCADE;
--- DROP TABLE IF EXISTS users CASCADE;
--- DROP TABLE IF EXISTS user_profile CASCADE;
--- ======================================
+-- Cleanup (Optional)
+DROP TABLE IF EXISTS event_participant CASCADE;
+DROP TABLE IF EXISTS chat_message CASCADE;
+DROP TABLE IF EXISTS event_chat CASCADE;
+DROP TABLE IF EXISTS event CASCADE;
+DROP TABLE IF EXISTS event_bio_tags CASCADE;
+DROP TABLE IF EXISTS event_bio CASCADE;
+DROP TABLE IF EXISTS event_organiser CASCADE;
+DROP TABLE IF EXISTS user_languages CASCADE;
+DROP TABLE IF EXISTS user_bio_tags CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS user_profile CASCADE;
 
+-- 1. User Profile (Includes @Embedded UserLocation)
+CREATE TABLE user_profile (
+                              id UUID PRIMARY KEY,
+                              user_name VARCHAR(255) NOT NULL UNIQUE,
+                              age INTEGER NOT NULL,
+                              nationality VARCHAR(255),
+                              profile_picture BYTEA, -- @Lob
+    -- @Embedded UserLocation fields
+                              city VARCHAR(255),
+                              country VARCHAR(255)
+);
 
--- ======================================
--- USERS & USER PROFILE
--- ======================================
+-- Auxiliary tables for UserProfile (@ElementCollection)
+CREATE TABLE user_languages (
+                                user_profile_id UUID NOT NULL,
+                                language VARCHAR(255),
+                                FOREIGN KEY (user_profile_id) REFERENCES user_profile(id)
+);
 
--- USER PROFILES
-INSERT INTO user_profile (id, user_name, age, nationality, city, country)
-VALUES
-    ('11111111-1111-1111-1111-111111111111', 'Alice', 22, 'Spain', 'Leuven', 'Belgium'),
-    ('22222222-2222-2222-2222-222222222222', 'Bob', 25, 'Netherlands', 'Leuven', 'Belgium')
-    ON CONFLICT (id) DO NOTHING;
+CREATE TABLE user_bio_tags (
+                               user_bio_id UUID NOT NULL, -- Defined in @CollectionTable
+                               tag VARCHAR(255),          -- Enum as String
+                               FOREIGN KEY (user_bio_id) REFERENCES user_profile(id)
+);
 
--- USER LANGUAGES
-INSERT INTO user_languages (user_profile_id, language)
-VALUES
-    ('11111111-1111-1111-1111-111111111111', 'Spanish'),
-    ('11111111-1111-1111-1111-111111111111', 'English'),
-    ('22222222-2222-2222-2222-222222222222', 'Dutch'),
-    ('22222222-2222-2222-2222-222222222222', 'English')
-    ON CONFLICT DO NOTHING;
+-- 2. User (OneToOne with UserProfile)
+CREATE TABLE users (
+                       user_id UUID PRIMARY KEY,
+                       email VARCHAR(255) NOT NULL UNIQUE,
+                       is_active BOOLEAN NOT NULL,
+                       user_profile_id UUID,
+                       FOREIGN KEY (user_profile_id) REFERENCES user_profile(id) ON DELETE CASCADE
+);
 
--- USER INTEREST TAGS
-INSERT INTO user_bio_tags (user_bio_id, tag)
-VALUES
-    ('11111111-1111-1111-1111-111111111111', 'MUSIC'),
-    ('11111111-1111-1111-1111-111111111111', 'FOOD'),
-    ('22222222-2222-2222-2222-222222222222', 'TECHNOLOGY'),
-    ('22222222-2222-2222-2222-222222222222', 'SPORTS')
-    ON CONFLICT DO NOTHING;
+-- 3. Event Organiser
+CREATE TABLE event_organiser (
+                                 id UUID PRIMARY KEY,
+                                 email VARCHAR(255) NOT NULL UNIQUE,
+                                 user_profile_id UUID,
+                                 FOREIGN KEY (user_profile_id) REFERENCES user_profile(id)
+);
 
--- USERS
-INSERT INTO users (user_id, email, user_profile_id, is_active)
-VALUES
-    ('aaaa1111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'alice@mail.com', '11111111-1111-1111-1111-111111111111', true),
-    ('bbbb2222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'bob@mail.com', '22222222-2222-2222-2222-222222222222', true)
-    ON CONFLICT (user_id) DO NOTHING;
+-- 4. Event Bio
+CREATE TABLE event_bio (
+                           id UUID PRIMARY KEY,
+                           description VARCHAR(255),
+                           image BYTEA
+);
 
+-- Auxiliary table for EventBio (@ElementCollection)
+CREATE TABLE event_bio_tags (
+                                event_bio_id UUID NOT NULL,
+                                tag VARCHAR(255), -- Enum InterestTag as String
+                                FOREIGN KEY (event_bio_id) REFERENCES event_bio(id)
+);
 
--- ======================================
--- EVENTS
--- ======================================
+-- 5. Event (Includes @Embedded EventLocation)
+CREATE TABLE event (
+                       event_id UUID PRIMARY KEY,
+                       name VARCHAR(255),
+                       start_date TIMESTAMP,
+                       end_date TIMESTAMP,
+                       event_status VARCHAR(50), -- Enum EventStatus
+    -- @Embedded EventLocation fields
+                       city VARCHAR(255),
+                       place_name VARCHAR(255),
+    -- Relationships
+                       event_bio_id UUID,
+                       organiser_id UUID,
+                       FOREIGN KEY (event_bio_id) REFERENCES event_bio(id) ON DELETE CASCADE,
+                       FOREIGN KEY (organiser_id) REFERENCES event_organiser(id)
+);
 
--- EVENT BIO
-INSERT INTO event_bio (id, description, image)
-VALUES
-    ('33333333-3333-3333-3333-333333333333', 'Tech innovation meetup', NULL),
-    ('44444444-4444-4444-4444-444444444444', 'Music jam session', NULL)
-    ON CONFLICT (id) DO NOTHING;
+-- 6. Event Participant
+CREATE TABLE event_participant (
+                                   id UUID PRIMARY KEY,
+                                   email VARCHAR(255) NOT NULL UNIQUE, -- Note: unique=true in entity restricts email globally
+                                   user_profile_id UUID,
+                                   event_id UUID,
+                                   FOREIGN KEY (user_profile_id) REFERENCES user_profile(id),
+                                   FOREIGN KEY (event_id) REFERENCES event(event_id)
+);
 
--- EVENT BIO TAGS
-INSERT INTO event_bio_tags (event_bio_id, tag)
-VALUES
-    ('33333333-3333-3333-3333-333333333333', 'TECHNOLOGY'),
-    ('33333333-3333-3333-3333-333333333333', 'EDUCATION'),
-    ('44444444-4444-4444-4444-444444444444', 'MUSIC'),
-    ('44444444-4444-4444-4444-444444444444', 'ART')
-    ON CONFLICT DO NOTHING;
+-- 7. Event Chat (OneToOne with Event)
+CREATE TABLE event_chat (
+                            id UUID PRIMARY KEY,
+                            event_id UUID NOT NULL UNIQUE, -- Unique constraint for OneToOne
+                            FOREIGN KEY (event_id) REFERENCES event(event_id)
+);
 
--- ORGANISERS
-INSERT INTO event_organiser (id, user_profile_id)
-VALUES
-    ('55555555-5555-5555-5555-555555555555', '11111111-1111-1111-1111-111111111111'),
-    ('66666666-6666-6666-6666-666666666666', '22222222-2222-2222-2222-222222222222')
-    ON CONFLICT (id) DO NOTHING;
-
--- EVENTS
-INSERT INTO event (event_id, name, event_bio_id, organiser_id, city, place_name, start_date, end_date, event_status)
-VALUES
-    ('77777777-7777-7777-7777-777777777777', 'AI Workshop', '33333333-3333-3333-3333-333333333333', '55555555-5555-5555-5555-555555555555',
-     'Leuven', 'Campus Hall', '2025-10-20T14:00:00', '2025-10-20T18:00:00', 'ACTIVE'),
-
-    ('88888888-8888-8888-8888-888888888888', 'Live Music Night', '44444444-4444-4444-4444-444444444444', '66666666-6666-6666-6666-666666666666',
-     'Leuven', 'Student Bar', '2025-10-22T20:00:00', '2025-10-22T23:30:00', 'ACTIVE')
-    ON CONFLICT (event_id) DO NOTHING;
-
--- EVENT PARTICIPANTS
-INSERT INTO event_participant (id, user_profile_id, event_id)
-VALUES
-    ('99999999-9999-9999-9999-999999999999', '11111111-1111-1111-1111-111111111111', '88888888-8888-8888-8888-888888888888'),
-    ('aaaa9999-aaaa-9999-aaaa-aaaaaaaa9999', '22222222-2222-2222-2222-222222222222', '77777777-7777-7777-7777-777777777777')
-    ON CONFLICT (id) DO NOTHING;
-
-
--- ======================================
--- EVENT CHATS
--- ======================================
-INSERT INTO event_chat (id, event_id)
-VALUES
-    ('cccccccc-cccc-cccc-cccc-cccccccccccc', '77777777-7777-7777-7777-777777777777'), -- AI Workshop
-    ('dddddddd-dddd-dddd-dddd-dddddddddddd', '88888888-8888-8888-8888-888888888888')  -- Live Music Night
-    ON CONFLICT (id) DO NOTHING;
-
-
--- ======================================
--- CHAT MESSAGES
--- ======================================
-INSERT INTO chat_message (id, chat_id, sender_id, encrypted_text, sent_at)
-VALUES
-    ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'cccccccc-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'SGVsbG8gYWxsIQ==', '2025-10-20T18:10:00'),
-    ('ffffffff-ffff-ffff-ffff-ffffffffffff', 'cccccccc-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'V2VsY29tZSB0byB0aGUgY2hhdCE=', '2025-10-20T18:11:00'),
-    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'dddddddd-dddd-dddd-dddd-dddddddddddd', '11111111-1111-1111-1111-111111111111', 'U2VlaW5nIHlvdSBhdCB0aGUgbXVzaWMgbmlnaHQh', '2025-10-22T20:10:00'),
-    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'dddddddd-dddd-dddd-dddd-dddddddddddd', '22222222-2222-2222-2222-222222222222', 'WWVhaCwgbGV0J3MganVuIG9uIHN0YWdlIQ==', '2025-10-22T20:12:00')
-    ON CONFLICT (id) DO NOTHING;
+-- 8. Chat Message
+CREATE TABLE chat_message (
+                              id UUID PRIMARY KEY,
+                              encrypted_text VARCHAR(255) NOT NULL,
+                              sent_at TIMESTAMP,
+                              chat_id UUID NOT NULL,
+                              sender_id UUID NOT NULL,
+                              FOREIGN KEY (chat_id) REFERENCES event_chat(id) ON DELETE CASCADE,
+                              FOREIGN KEY (sender_id) REFERENCES user_profile(id)
+);
