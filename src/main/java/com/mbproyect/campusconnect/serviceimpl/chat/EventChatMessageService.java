@@ -18,14 +18,15 @@ import com.mbproyect.campusconnect.service.event.EventService;
 import com.mbproyect.campusconnect.service.user.UserService;
 import com.mbproyect.campusconnect.shared.util.EncryptionUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("eventChatMessageService")
@@ -137,23 +138,27 @@ public class EventChatMessageService implements ChatMessageService {
         // Validate if user belongs to event
         User user = validateUser(eventChat.getEvent().getEventId());
 
-        var sort = Sort.by(Sort.Direction.ASC, "sentAt")
-                .and(Sort.by(Sort.Direction.ASC, "id"));
+        var sort = Sort.by(Sort.Direction.DESC, "sentAt");
         var pageable = PageRequest.of(page, size, sort);
 
         // Fetch messages
-        Page<ChatMessage> messages = chatMessageRepository.findByChat_Id(chatId, pageable);
+        Page<ChatMessage> messagesPage = chatMessageRepository.findByChat_Id(chatId, pageable);
+
+        // Reverse the content
+        // This ensures they render correctly from top to bottom.
+        List<ChatMessage> chronologicalMessages = new ArrayList<>(messagesPage.getContent());
+        Collections.reverse(chronologicalMessages);
 
         // Map to response
-        return messages.map(
-                message -> {
-                    String decryptedContent = encryptionUtil
-                        .decrypt(message.getEncryptedText());
+        List<ChatMessageResponse> responseList = chronologicalMessages.stream()
+                .map(message -> {
+                    String decryptedContent = encryptionUtil.decrypt(message.getEncryptedText());
+                    return ChatMessageMapper.toResponse(message, decryptedContent, user.getUserProfile().getId());
+                })
+                .collect(Collectors.toList());
 
-                    return ChatMessageMapper
-                            .toResponse(message, decryptedContent, user.getUserProfile().getId());
-                }
-        );
+        // Return new PageImpl to preserve pagination metadata
+        return new PageImpl<>(responseList, pageable, messagesPage.getTotalElements());
     }
 
 }

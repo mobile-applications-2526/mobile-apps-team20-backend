@@ -41,6 +41,8 @@ public class GoogleAuthServiceImpl implements ExternalAuthService {
 
             return idToken.getPayload().getEmail();
 
+
+
         } catch (IllegalArgumentException e) {
             // Catch malformed tokens here
             log.error("Token format is invalid: {}", e.getMessage());
