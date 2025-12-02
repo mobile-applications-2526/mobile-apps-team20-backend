@@ -190,7 +190,13 @@ public class EventServiceImpl implements EventService {
             int size
     ) {
         // Updated to include sort by StartDate Ascending
-        var pageable = PageRequest.of(page, size, Sort.by("startDate").ascending());
+        var sort = Sort.by("startDate")
+                .ascending()
+                .and(
+                        Sort.by("eventId")
+                                .ascending());
+
+        var pageable = PageRequest.of(page, size, sort);
         String currentUserEmail = userService.getCurrentUser();
 
         Page<Event> events = eventRepository
