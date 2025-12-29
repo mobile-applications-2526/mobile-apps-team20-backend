@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Types;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,6 +29,8 @@ public class UserProfile {
 
     private String nationality;
 
+    private String bio;
+
     @ElementCollection
     @CollectionTable(
             name = "user_languages",
@@ -41,6 +44,12 @@ public class UserProfile {
     @CollectionTable(name = "user_bio_tags", joinColumns = @JoinColumn(name = "user_bio_id"))
     @Column(name = "tag")
     private Set<InterestTag> interests;
+
+    @ElementCollection
+    @CollectionTable(name = "user_social_media", joinColumns = @JoinColumn(name = "user_profile_id"))
+    @MapKeyColumn(name = "platform_name")
+    @Column(name = "platform_username")
+    private Map<String, String> socialMedia;
 
     @Embedded
     private UserLocation userLocation;

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -17,6 +18,10 @@ public class UserProfileResponse {
     private UUID id;
 
     private String userName;
+
+    private String bio;
+
+    private Map<String, String> socialMedia;
 
     private String nationality;
 

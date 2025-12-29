@@ -5,6 +5,7 @@ import com.mbproyect.campusconnect.dto.user.response.UserProfileResponse;
 import com.mbproyect.campusconnect.model.entity.user.UserProfile;
 import com.mbproyect.campusconnect.model.entity.user.UserLocation;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,9 +20,17 @@ public class UserProfileMapper {
         }
 
         UserProfileResponse response = new UserProfileResponse();
+        response.setId(userProfile.getId());
         response.setUserName(userProfile.getUserName());
         response.setNationality(userProfile.getNationality());
         response.setAge(userProfile.getAge());
+
+        // Map new fields
+        response.setBio(userProfile.getBio());
+        response.setSocialMedia(
+                userProfile.getSocialMedia() != null ? new HashMap<>(userProfile.getSocialMedia()) : null
+        );
+
         response.setLanguages(
                 userProfile.getLanguages() != null ? new HashSet<>(userProfile.getLanguages()) : Set.of()
         );
@@ -29,8 +38,7 @@ public class UserProfileMapper {
                 userProfile.getInterests() != null ? new HashSet<>(userProfile.getInterests()) : Set.of()
         );
         response.setUserLocation(copyLocation(userProfile.getUserLocation()));
-        response.setId(userProfile.getId());
-    response.setProfilePicture(userProfile.getProfilePicture());
+        response.setProfilePicture(userProfile.getProfilePicture());
 
         return response;
     }
@@ -47,6 +55,13 @@ public class UserProfileMapper {
         userProfile.setUserName(request.getUserName());
         userProfile.setNationality(request.getNationality());
         userProfile.setAge(request.getAge());
+
+        // Map new fields
+        userProfile.setBio(request.getBio());
+        userProfile.setSocialMedia(
+                request.getSocialMedia() != null ? new HashMap<>(request.getSocialMedia()) : new HashMap<>()
+        );
+
         userProfile.setLanguages(
                 request.getLanguages() != null ? new HashSet<>(request.getLanguages()) : new HashSet<>()
         );
@@ -59,9 +74,8 @@ public class UserProfileMapper {
         return userProfile;
     }
 
-
     /**
-     * Copies the nested UserLocation object safely.
+     * Copies the nested UserLocation object safely to avoid reference issues.
      */
     private static UserLocation copyLocation(UserLocation source) {
         if (source == null) {
@@ -73,4 +87,3 @@ public class UserProfileMapper {
         return location;
     }
 }
-

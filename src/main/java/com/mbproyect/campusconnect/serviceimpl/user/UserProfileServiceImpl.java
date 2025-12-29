@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -41,7 +40,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         UserProfile profile = userProfileRepository
                 .findByUserName(username)
                 .orElseThrow(
-                        () -> new UserNotFoundException("UserProfile with username" + username + " not found)")
+                        () -> new UserNotFoundException("UserProfile with username" + username + " not found")
                 );
         return UserProfileMapper.toResponse(profile);
     }
