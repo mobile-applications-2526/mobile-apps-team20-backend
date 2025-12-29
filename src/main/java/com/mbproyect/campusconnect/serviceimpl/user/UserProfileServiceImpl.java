@@ -66,6 +66,12 @@ public class UserProfileServiceImpl implements UserProfileService {
             changed = true;
         }
 
+        // Bio
+        if (!Objects.equals(profile.getBio(), request.getBio())) {
+            profile.setBio(request.getBio());
+            changed = true;
+        }
+
         // Languages
         if (!Objects.equals(profile.getLanguages(), request.getLanguages())) {
             profile.setLanguages(request.getLanguages() != null ? new HashSet<>(request.getLanguages()) : new HashSet<>());
