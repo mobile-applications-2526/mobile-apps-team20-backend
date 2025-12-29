@@ -1,10 +1,8 @@
 package com.mbproyect.campusconnect.controller.user;
 
-import com.mbproyect.campusconnect.config.exceptions.user.UserNotFoundException;
 import com.mbproyect.campusconnect.dto.chat.response.EventChatResponse;
 import com.mbproyect.campusconnect.dto.user.request.UserProfileRequest;
 import com.mbproyect.campusconnect.dto.user.response.UserProfileResponse;
-import com.mbproyect.campusconnect.model.entity.user.User;
 import com.mbproyect.campusconnect.service.user.UserProfileService;
 import com.mbproyect.campusconnect.service.user.UserService;
 import jakarta.validation.Valid;
@@ -33,16 +31,16 @@ public class UserController {
      * Get a user profile by its ID.
      * Example: GET /api/users/{userProfileId}
      */
-    
-    @GetMapping("/me")
-    public ResponseEntity<UserProfileResponse> getMyProfile() {
-        String email = userService.getCurrentUser();
-
-        User user = userService.findUserByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        UUID userProfileId = user.getUserProfile().getId();
+    @GetMapping("/{userProfileId}")
+    public ResponseEntity<UserProfileResponse> getUserProfileById(@PathVariable UUID userProfileId) {
         UserProfileResponse response = userProfileService.getById(userProfileId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<UserProfileResponse> getUserProfileByUsername(@PathVariable String username) {
+        UserProfileResponse response = userProfileService
+                .getByUsername(username);
         return ResponseEntity.ok(response);
     }
 
@@ -54,30 +52,25 @@ public class UserController {
         return ResponseEntity.ok(userService.getChats(page, size));
     }
 
-        /**
-         * Update current authenticated user's profile fields:
-         * - userName
-         * - nationality
-         * - languages
-         * - interests
-         * - userLocation (city, country)
-         * - age
-         *
-         * Example: PUT /api/user/me
-         */
-        @PutMapping("/me")
-        public ResponseEntity<UserProfileResponse> updateUserProfile(
+    /**
+     * Update user profile fields:
+     * - userName
+     * - nationality
+     * - languages
+     * - interests
+     * - userLocation (city, country)
+     * - age
+     *
+     * Example: PUT /api/users/{userProfileId}
+     */
+    @PutMapping("/{userProfileId}")
+    public ResponseEntity<UserProfileResponse> updateUserProfile(
+            @PathVariable UUID userProfileId,
             @Valid @RequestBody UserProfileRequest request
-        ) {
-        String email = userService.getCurrentUser();
-
-        User user = userService.findUserByEmail(email)
-            .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        UUID userProfileId = user.getUserProfile().getId();
+    ) {
         UserProfileResponse response = userProfileService.update(userProfileId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
-        }
+    }
     
    
 }

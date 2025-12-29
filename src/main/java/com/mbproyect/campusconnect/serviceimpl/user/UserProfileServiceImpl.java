@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -31,6 +32,17 @@ public class UserProfileServiceImpl implements UserProfileService {
     public UserProfileResponse getById(UUID userProfileId) {
         UserProfile profile = userProfileRepository.findById(userProfileId)
                 .orElseThrow(() -> new UserNotFoundException("UserProfile with id " + userProfileId + " not found"));
+        return UserProfileMapper.toResponse(profile);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public UserProfileResponse getByUsername(String username) {
+        UserProfile profile = userProfileRepository
+                .findByUserName(username)
+                .orElseThrow(
+                        () -> new UserNotFoundException("UserProfile with username" + username + " not found)")
+                );
         return UserProfileMapper.toResponse(profile);
     }
 

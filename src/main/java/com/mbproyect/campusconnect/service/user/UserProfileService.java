@@ -15,6 +15,8 @@ public interface UserProfileService {
 
     UserProfileResponse getById(@NotNull UUID userProfileId);
 
+    UserProfileResponse getByUsername(@NotNull String username);
+
     UserProfileResponse update(@NotNull UUID userProfileId, @Valid UserProfileRequest request);
 
     
