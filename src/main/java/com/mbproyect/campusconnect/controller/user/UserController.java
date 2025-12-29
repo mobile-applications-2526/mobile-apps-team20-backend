@@ -52,6 +52,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getChats(page, size));
     }
 
+    @GetMapping("/location")
+    ResponseEntity<String> getUserLocation() {
+        return ResponseEntity.ok(userService.getUserLocation());
+    }
+
     /**
      * Update user profile fields:
      * - userName

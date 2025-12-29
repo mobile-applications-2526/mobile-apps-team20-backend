@@ -132,4 +132,15 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+    @Override
+    public String getUserLocation() {
+        String email = this.getCurrentUser();
+
+        // Fetch the location
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        return user.getUserProfile().getUserLocation().getCity();
+    }
 }
