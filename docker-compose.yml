@@ -1,4 +1,28 @@
 services:
+  app:
+    build: .
+    environment:
+      - SERVER_PORT=8081
+      - DB_URL=jdbc:postgresql://postgres:5432/CampusConnect
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - ENCRYPT_SECRET_KEY=${ENCRYPT_SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - ACTIVATE_ACCOUNT_URL=${ACTIVATE_ACCOUNT_URL}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    ports:
+      - "${SERVER_PORT}:8081"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - my-network
   postgres:
     image: postgres:latest
     environment:
