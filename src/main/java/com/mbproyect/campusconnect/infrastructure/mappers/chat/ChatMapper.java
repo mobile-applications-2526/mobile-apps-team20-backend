@@ -28,8 +28,8 @@ public class ChatMapper {
         // Null checks before accessing the byte array
         if (chat.getEvent() != null
                 && chat.getEvent().getEventBio() != null
-                && chat.getEvent().getEventBio().getImage() != null) {
-            eventImage = Base64.getEncoder().encodeToString(chat.getEvent().getEventBio().getImage());
+                && chat.getEvent().getEventBio().getImageUrl() != null) {
+            eventImage = chat.getEvent().getEventBio().getImageUrl();
         }
 
         ChatMessageResponse lastMessageResponse = null;

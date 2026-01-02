@@ -154,7 +154,7 @@ VALUES
     ON CONFLICT (id) DO NOTHING;
 
 -- 4. INSERT EVENT BIO & EVENT
-INSERT INTO event_bio (id, description, image)
+INSERT INTO event_bio (id, description, image_url)
 VALUES
     ('eb000000-0000-0000-0000-000000000001', 'A cool tech meetup for developers', NULL)
     ON CONFLICT (id) DO NOTHING;

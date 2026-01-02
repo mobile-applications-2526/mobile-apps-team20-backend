@@ -1,11 +1,14 @@
 package com.mbproyect.campusconnect.controller.event;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mbproyect.campusconnect.dto.event.request.EventRequest;
 import com.mbproyect.campusconnect.dto.event.response.EventParticipantResponse;
 import com.mbproyect.campusconnect.dto.event.response.EventResponse;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
 import com.mbproyect.campusconnect.service.event.EventParticipantService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.mbproyect.campusconnect.service.event.EventService;
@@ -25,10 +28,12 @@ public class EventController {
 
     private final EventService eventService;
     private final EventParticipantService eventParticipantService;
+    private final ObjectMapper objectMapper;
 
-    public EventController (EventService eventService, EventParticipantService eventParticipantService) {
+    public EventController (EventService eventService, EventParticipantService eventParticipantService, ObjectMapper objectMapper) {
         this.eventService = eventService;
         this.eventParticipantService = eventParticipantService;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -131,11 +136,17 @@ public class EventController {
         );
     }
 
-    @PostMapping
+    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<EventResponse> createEvent(
-            @Valid @RequestBody EventRequest eventRequest,
+            @RequestPart("data") String eventRequestStr,
             @RequestPart(value = "image", required = false) MultipartFile imageFile
-    ) {
+    ) throws JsonProcessingException {
+
+        EventRequest eventRequest = objectMapper
+                .readValue(eventRequestStr, EventRequest.class);
+
+        System.out.println(eventRequest);
+
         EventResponse response = eventService.createEvent(
                 eventRequest, imageFile
         );

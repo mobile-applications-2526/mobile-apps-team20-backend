@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Configuration;
 
 import org.springframework.context.annotation.Bean;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -30,8 +32,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf(customizer -> customizer.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers(HttpMethod.GET, "/api/uploads/**").permitAll()// Authorized endpoints
                         .requestMatchers(
                                 "/api/auth/login",
                                 "/api/auth/register",
@@ -44,8 +47,7 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**",
                                 "/error"
-                        ) // Authorized endpoints
-                        .permitAll()
+                        ).permitAll()
                         .anyRequest()
                         .authenticated()
                 )

@@ -16,7 +16,7 @@ public class EventBioRequest {
 
     private String description;
 
-    private byte[] image;
+    private String image;
 
     @NotNull
     @Size(max = 5)
