@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
                                 .getLastMessageIdSeen();
                     }
 
-                    long unseenMessagesCount = 0;
+                    long unseenMessagesCount = -1;
 
                     if (messageId != null) {
                         unseenMessagesCount = eventChatService
@@ -133,7 +133,9 @@ public class UserServiceImpl implements UserService {
                                     lastMessage,
                                     decryptedContent,
                                     actualUser.getUserId(),
-                                    unseenMessagesCount
+                                    unseenMessagesCount == -1
+                                            ? (long) chat.getMessages().size()
+                                            : unseenMessagesCount
                             );
                 }
         );
