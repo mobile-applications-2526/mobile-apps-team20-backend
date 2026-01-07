@@ -1,0 +1,54 @@
+services:
+  app:
+    build: .
+    environment:
+      - SERVER_PORT=8081
+      - DB_URL=jdbc:postgresql://postgres:5432/CampusConnect
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - ENCRYPT_SECRET_KEY=${ENCRYPT_SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - ACTIVATE_ACCOUNT_URL=${ACTIVATE_ACCOUNT_URL}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    ports:
+      - "${SERVER_PORT}:8081"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - my-network
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: CampusConnect
+    labels:
+      - "org.springframework.boot.service-connection=postgres"
+    ports:
+      - "5433:5432"
+    networks:
+      - my-network
+
+  redis:
+    image: redis:7.4
+    container_name: redis-dev
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+
+networks:
+  my-network:
+    driver: bridge

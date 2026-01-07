@@ -1,6 +1,6 @@
 package com.mbproyect.campusconnect.shared.validation.user;
 
-import com.mbproyect.campusconnect.config.exceptions.event.UserNotFoundException;
+import com.mbproyect.campusconnect.config.exceptions.user.UserNotFoundException;
 import com.mbproyect.campusconnect.infrastructure.repository.user.UserRepository;
 import com.mbproyect.campusconnect.model.entity.user.User;
 import lombok.extern.slf4j.Slf4j;

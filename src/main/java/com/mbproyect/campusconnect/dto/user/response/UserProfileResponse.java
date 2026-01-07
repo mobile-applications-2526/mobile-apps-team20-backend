@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,6 +19,10 @@ public class UserProfileResponse {
 
     private String userName;
 
+    private String bio;
+
+    private Map<String, String> socialMedia;
+
     private String nationality;
 
     private Set<String> languages;
@@ -27,4 +32,7 @@ public class UserProfileResponse {
     private Set<InterestTag> interests;
 
     private UserLocation userLocation;
+
+    // Filename/path of the stored profile picture
+    private String profilePicture;
 }

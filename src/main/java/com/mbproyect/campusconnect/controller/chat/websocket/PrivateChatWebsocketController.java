@@ -9,6 +9,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
 import java.util.UUID;
 
 /**
@@ -32,9 +33,11 @@ public class PrivateChatWebsocketController {
     @MessageMapping("/user/{chatId}/send")
     public void sendMessage(
             @DestinationVariable UUID chatId,
-            ChatMessageRequest messageRequest
+            ChatMessageRequest messageRequest,
+            Principal principal  // Provides the authentication state
     ) {
-        ChatMessageResponse chatMessageResponse = messageService.sendMessage(messageRequest, chatId);
+        ChatMessageResponse chatMessageResponse = messageService
+                .sendMessage(messageRequest, chatId, principal.getName());
 
         // Sends the message to chatId subscribers
         messagingTemplate.convertAndSend(

@@ -1,4 +1,4 @@
-package com.juangomez.campusconnect;
+package com.mbproyect.campusconnect;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -17,7 +17,7 @@ public class EventBioResponse {
 
     private String description;
 
-    private byte[] image;
+    private String image;
 
     private Set<InterestTag> interestTags;
 

@@ -23,8 +23,10 @@ public class EventOrganiserMapper {
 
         EventOrganiserResponse response = new EventOrganiserResponse();
         response.setId(organiser.getId());
-        response.setName(organiser.getUserProfile().getUserName());
-        response.setProfileId(organiser.getUserProfile().getId());
+        response.setProfile(
+                UserProfileMapper
+                        .toResponse(organiser.getUserProfile())
+        );
 
         return response;
     }

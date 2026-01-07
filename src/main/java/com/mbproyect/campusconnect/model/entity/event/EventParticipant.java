@@ -18,11 +18,16 @@ public class EventParticipant {
     @EqualsAndHashCode.Include
     private UUID id;
 
+    @Column(nullable = false)
+    private String email;
+
     @ManyToOne
     private UserProfile userProfile;
 
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
+
+    private UUID lastMessageIdSeen;
 
 }

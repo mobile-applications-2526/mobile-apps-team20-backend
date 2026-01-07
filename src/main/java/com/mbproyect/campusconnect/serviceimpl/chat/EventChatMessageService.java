@@ -1,65 +1,209 @@
 package com.mbproyect.campusconnect.serviceimpl.chat;
 
 import com.mbproyect.campusconnect.config.exceptions.chat.ChatNotFoundException;
-import com.mbproyect.campusconnect.config.exceptions.event.UserNotFoundException;
+import com.mbproyect.campusconnect.config.exceptions.user.UserNotFoundException;
 import com.mbproyect.campusconnect.dto.chat.request.ChatMessageRequest;
+import com.mbproyect.campusconnect.dto.chat.request.MarkChatReadRequest;
 import com.mbproyect.campusconnect.dto.chat.response.ChatMessageResponse;
 import com.mbproyect.campusconnect.infrastructure.mappers.chat.ChatMessageMapper;
 import com.mbproyect.campusconnect.infrastructure.repository.chat.ChatMessageRepository;
 import com.mbproyect.campusconnect.infrastructure.repository.chat.ChatRepository;
+import com.mbproyect.campusconnect.infrastructure.repository.event.EventOrganiserRepository;
+import com.mbproyect.campusconnect.infrastructure.repository.event.EventParticipantRepository;
+import com.mbproyect.campusconnect.infrastructure.repository.event.EventRepository;
+import com.mbproyect.campusconnect.infrastructure.repository.user.UserProfileRepository;
 import com.mbproyect.campusconnect.infrastructure.repository.user.UserRepository;
 import com.mbproyect.campusconnect.model.entity.chat.ChatMessage;
 import com.mbproyect.campusconnect.model.entity.chat.EventChat;
+import com.mbproyect.campusconnect.model.entity.event.Event;
+import com.mbproyect.campusconnect.model.entity.event.EventParticipant;
+import com.mbproyect.campusconnect.model.entity.user.User;
 import com.mbproyect.campusconnect.model.entity.user.UserProfile;
+import com.mbproyect.campusconnect.model.enums.EventStatus;
 import com.mbproyect.campusconnect.service.chat.ChatMessageService;
+import com.mbproyect.campusconnect.service.event.EventParticipantService;
+import com.mbproyect.campusconnect.service.event.EventService;
+import com.mbproyect.campusconnect.service.user.UserService;
 import com.mbproyect.campusconnect.shared.util.EncryptionUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service("eventChatMessageService")
 public class EventChatMessageService implements ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRepository chatRepository;
+    private final EncryptionUtil encryptionUtil;
+    private final UserService userService;
     private final UserRepository userRepository;
+    private final EventService eventService;
+    private final EventParticipantService eventParticipantService;
+    private final EventParticipantRepository eventParticipantRepository;
+    private final EventRepository eventRepository;
+    private final EventOrganiserRepository eventOrganiserRepository;
 
     public EventChatMessageService (
             ChatMessageRepository chatMessageRepository,
             ChatRepository chatRepository,
-            UserRepository userRepository
-    ) {
+            EncryptionUtil encryptionUtil,
+            UserService userService,
+            UserRepository userRepository,
+            EventService eventService, EventParticipantService eventParticipantService, EventParticipantRepository eventParticipantRepository, EventRepository eventRepository, EventOrganiserRepository eventOrganiserRepository) {
         this.chatMessageRepository = chatMessageRepository;
         this.chatRepository = chatRepository;
+        this.encryptionUtil = encryptionUtil;
+        this.userService = userService;
         this.userRepository = userRepository;
+        this.eventService = eventService;
+        this.eventParticipantService = eventParticipantService;
+        this.eventParticipantRepository = eventParticipantRepository;
+        this.eventRepository = eventRepository;
+        this.eventOrganiserRepository = eventOrganiserRepository;
     }
 
+    private boolean isUserAuthorized (String email, UUID eventId) {
+        return eventService.doesUserBelongsToEvent(email, eventId);
+    }
+
+    private User validateUser(UUID eventId) {
+
+        String currentUserEmail = userService.getCurrentUser();
+
+        if (!isUserAuthorized(currentUserEmail, eventId)) {
+            log.warn("User not authorized");
+            throw new IllegalStateException("Unauthorized action");
+        }
+
+        return userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new UserNotFoundException("Invalid userprofile id"));
+    }
+
+    // Version for websocket connection
+    private User validateUser(UUID eventId, String currentUserEmail) {
+
+        if (!isUserAuthorized(currentUserEmail, eventId)) {
+            log.warn("User not authorized for websocket connection");
+            throw new IllegalStateException("Unauthorized action");
+        }
+
+        return userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new UserNotFoundException("Invalid userprofile id"));
+    }
+
+    @Transactional
     @Override
-    public ChatMessageResponse sendMessage(ChatMessageRequest chatMessageRequest, UUID chatId) {
+    public ChatMessageResponse sendMessage(
+            ChatMessageRequest chatMessageRequest,
+            UUID chatId,
+            String userEmail
+    ) {
+
+        log.info("Sending chat message");
+        EventChat eventChat = chatRepository.findEventChatById(chatId);
+
+        if (eventChat == null) {
+            log.warn("Event chat not found");
+            throw new ChatNotFoundException("The id does not match with any chat");
+        }
+
+        var eventId = eventChat.getEvent().getEventId();
+
+        User sender = validateUser(eventId, userEmail);
+        // Use helper to encrypt message content in the db
+        String encryptedContent = encryptionUtil.encrypt(chatMessageRequest.getContent());
+
+        ChatMessage message = ChatMessageMapper
+                .toEntity(eventChat, sender.getUserProfile(), encryptedContent);
+
+        // Create the response
+        var savedMessage = chatMessageRepository.save(message);
+        String decryptedContent = encryptionUtil
+                .decrypt(savedMessage.getEncryptedText());
+
+        return ChatMessageMapper
+                .toResponse(
+                        savedMessage,
+                        decryptedContent,
+                        sender.getUserProfile().getId()
+                );
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<ChatMessageResponse> getMessages(
+            UUID chatId,
+            int page,
+            int size
+    ) {
+
         EventChat eventChat = chatRepository.findEventChatById(chatId);
 
         if (eventChat == null) {
             throw new ChatNotFoundException("The id does not match with any chat");
         }
 
-        //TODO: When server authenticated, take userprofile by the actual user of the token
-        UserProfile sender = userRepository
-                .findUserByUserProfile_Id(chatMessageRequest.getUserProfileId());
+        // Validate if user belongs to event
+        User user = validateUser(eventChat.getEvent().getEventId());
 
-        if (sender == null) {
-            throw new UserNotFoundException("Invalid userprofile id");
+        var sort = Sort.by(Sort.Direction.DESC, "sentAt");
+        var pageable = PageRequest.of(page, size, sort);
+
+        // Fetch messages
+        Page<ChatMessage> messagesPage = chatMessageRepository.findByChat_Id(chatId, pageable);
+
+        // Reverse the content
+        // This ensures they render correctly from top to bottom.
+        List<ChatMessage> chronologicalMessages = new ArrayList<>(messagesPage.getContent());
+        Collections.reverse(chronologicalMessages);
+
+        // Map to response
+        List<ChatMessageResponse> responseList = chronologicalMessages.stream()
+                .map(message -> {
+                    String decryptedContent = encryptionUtil.decrypt(message.getEncryptedText());
+                    return ChatMessageMapper.toResponse(message, decryptedContent, user.getUserProfile().getId());
+                })
+                .collect(Collectors.toList());
+
+        // Return new PageImpl to preserve pagination metadata
+        return new PageImpl<>(responseList, pageable, messagesPage.getTotalElements());
+    }
+
+    @Override
+    public void markRead(UUID chatId, MarkChatReadRequest request) {
+        String email = userService.getCurrentUser();
+
+        Event event = eventRepository
+                .findByChat_IdAndEventStatus(chatId, EventStatus.ACTIVE);
+
+        if (chatId == null) {
+            throw new ChatNotFoundException("Chat not found");
         }
 
-        // Use helper to encrypt message content in the db
-        String encryptedContent = EncryptionUtil.encrypt(chatMessageRequest.getContent());
+        // If user is the organizer
+        var organiser = event.getOrganiser();
 
-        ChatMessage message = ChatMessageMapper
-                .toEntity(eventChat, sender, encryptedContent);
+        if (email.equals(organiser.getEmail())) {
+            organiser.setLastMessageSeen(request.messageId());
+            eventOrganiserRepository.save(organiser);
+            return;
+        }
 
-        chatMessageRepository.save(message);
+        // If the user is an event participant
+        EventParticipant participant = eventParticipantService
+                .getParticipantByEmailAndChatId(chatId, email);
 
-        return this.chatMessageRepository
-                .findChatMessageById(message.getId());
+        // Update the last message seen
+        participant.setLastMessageIdSeen(request.messageId());
+        eventParticipantRepository.save(participant);
     }
 
 }

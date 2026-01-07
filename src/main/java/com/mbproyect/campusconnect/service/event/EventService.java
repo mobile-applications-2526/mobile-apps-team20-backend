@@ -5,13 +5,16 @@ import com.mbproyect.campusconnect.dto.event.request.EventRequest;
 import com.mbproyect.campusconnect.dto.event.response.EventResponse;
 import com.mbproyect.campusconnect.model.enums.InterestTag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,17 +28,59 @@ public interface EventService {
 
       EventResponse getEventById(@NotNull UUID eventId);
 
-     Set<EventResponse> getEventsByAnyTag(@NotNull Set<InterestTag> tags);
-
-     List<EventResponse> getEventsByDateAscending (
-             @JsonFormat(pattern ="yyyy-MM-dd'T'HH:mm") @NotNull LocalDateTime eventDate
+     Page<EventResponse> getEventsByAnyTag(
+             @NotNull Set<InterestTag> tags,
+             @Min(0) int page,
+             @Min(1) @Max(50) int size
      );
 
-     Set<EventResponse> getEventsByLocation (@NotBlank String city);
+     Page<EventResponse> getEventsByDateAscending (
+             @JsonFormat(pattern ="yyyy-MM-dd'T'HH:mm")
+             @NotNull LocalDateTime eventDate,
+             @Min(0) int page,
+             @Min(1) @Max(50) int size
+     );
 
-     EventResponse createEvent (@Valid EventRequest eventRequest);
+     Page<EventResponse> getEventsByLocation (
+             @NotBlank String city,
+             @Min(0) int page,
+             @Min(1) @Max(50) int size
+     );
 
-     EventResponse updateEvent (@Valid EventRequest eventRequest, @NotNull UUID eventId);
+     Page<EventResponse> getEventsByLocationAndInterestTag(
+             @NotBlank String city,
+             @NotNull Set<InterestTag> tags,
+             @Min(0) int page,
+             @Min(1) @Max(50) int size
+     );
+
+     Page<EventResponse> getEventsByDateAndInterestTag(
+             @NotBlank LocalDateTime startDate,
+             @NotNull Set<InterestTag> tags,
+             @Min(0) int page,
+             @Min(1) @Max(50) int size
+     );
+
+     boolean doesUserBelongsToEvent(
+             @NotBlank String email,
+             @NotNull UUID eventId
+     );
+
+     EventResponse createEvent (
+             @Valid EventRequest eventRequest,
+             MultipartFile imageFile
+     );
+
+     EventResponse updateEvent (
+             @Valid EventRequest eventRequest,
+             @NotNull UUID eventId,
+             MultipartFile imageFile
+     );
 
      void deleteEvent (@NotNull UUID eventId);
+
+     Page<EventResponse> getEventsCreatedByCurrentUser(
+             @Min(0) int page,
+             @Min(1) @Max(50) int size
+     );
 }

@@ -21,7 +21,7 @@ public class EventParticipantMapper {
         response.setId(participant.getId());
         response.setUserProfile(userProfileResponse);
         response.setEventId(event != null ? event.getEventId() : null);
-        response.setEventName(event != null ? event.getName() : null);
+        response.setEmail(participant.getEmail());
 
         return response;
     }

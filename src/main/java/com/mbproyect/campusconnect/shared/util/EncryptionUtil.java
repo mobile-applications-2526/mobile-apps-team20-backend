@@ -1,11 +1,16 @@
 package com.mbproyect.campusconnect.shared.util;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.UUID;
 
+@Component
 public class EncryptionUtil {
 
     private static final String AES = "AES";
@@ -13,18 +18,29 @@ public class EncryptionUtil {
     private static final int GCM_TAG_LENGTH = 128;
     private static final int IV_LENGTH = 12;
 
-    // Load once when the class loads
-    private static final byte[] secretKeyBytes = loadKey();
+    private final byte[] secretKeyBytes;
 
-    private static byte[] loadKey() {
-        String base64Key = System.getenv("CHAT_SECRET_KEY");
+    public EncryptionUtil(@Value("${app.encryption.key}") String base64Key) {
         if (base64Key == null || base64Key.isBlank()) {
-            throw new IllegalStateException("CHAT_SECRET_KEY environment variable not set");
+            throw new IllegalStateException("app.encryption.key is missing or empty");
         }
-        return Base64.getDecoder().decode(base64Key);
+        this.secretKeyBytes = Base64.getDecoder().decode(base64Key);
     }
 
-    public static String encrypt(String plainText) {
+    public static String generateNumericCode(int length) {
+        SecureRandom random = new SecureRandom();
+        StringBuilder code = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            code.append(random.nextInt(10)); // Numbers from 0 to 9
+        }
+        return code.toString();
+    }
+
+    public static UUID generateToken() {
+        return UUID.randomUUID();
+    }
+
+    public String encrypt(String plainText) {
         try {
             byte[] iv = new byte[IV_LENGTH];
             new SecureRandom().nextBytes(iv);
@@ -45,7 +61,7 @@ public class EncryptionUtil {
         }
     }
 
-    public static String decrypt(String encryptedText) {
+    public String decrypt(String encryptedText) {
         try {
             byte[] decoded = Base64.getDecoder().decode(encryptedText);
             byte[] iv = new byte[IV_LENGTH];

@@ -21,7 +21,7 @@ public class EventBio {
 
     private String description;
 
-    private byte [] image;
+    private String imageUrl; // O multipartFile
 
     /**
      * Creates a table for the enum tag
@@ -32,9 +32,9 @@ public class EventBio {
     @Column(name = "tag")
     private Set<InterestTag> interestTags;
 
-    public EventBio(String description, byte[] image, Set<InterestTag> interestTags) {
+    public EventBio(String description, String image, Set<InterestTag> interestTags) {
         this.description = description;
-        this.image = image;
+        this.imageUrl = image;
         this.interestTags = interestTags;
     }
 

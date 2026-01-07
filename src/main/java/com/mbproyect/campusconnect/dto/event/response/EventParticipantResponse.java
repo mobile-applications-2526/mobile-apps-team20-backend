@@ -14,8 +14,9 @@ public class EventParticipantResponse {
 
     private UUID id;
 
+    private String email;
+
     private UserProfileResponse userProfile;
 
     private UUID eventId;
-    private String eventName;
 }

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -22,6 +23,10 @@ public class UserProfileRequest {
     @NotNull
     private String nationality;
 
+    private String bio;
+
+    private Map<String, String> socialMedia;
+
     @NotNull
     private Set<String> languages;
 
@@ -33,5 +38,8 @@ public class UserProfileRequest {
 
     @NotNull
     private UserLocation userLocation;
+
+    // Stores the filename/path of the uploaded profile picture (if any)
+    private String profilePicture;
 
 }

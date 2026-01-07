@@ -20,7 +20,7 @@ public class EventBioMapper {
         EventBioResponse response = new EventBioResponse();
         response.setId(eventBio.getId());
         response.setDescription(eventBio.getDescription());
-        response.setImage(eventBio.getImage());
+        response.setImage(eventBio.getImageUrl());
         response.setInterestTags(
                 eventBio.getInterestTags() != null ? new HashSet<>(eventBio.getInterestTags()) : Set.of()
         );
@@ -38,7 +38,7 @@ public class EventBioMapper {
 
         EventBio eventBio = new EventBio();
         eventBio.setDescription(request.getDescription());
-        eventBio.setImage(request.getImage());
+        eventBio.setImageUrl(request.getImage());
         eventBio.setInterestTags(
                 request.getInterestTags() != null ? new HashSet<>(request.getInterestTags()) : new HashSet<>()
         );

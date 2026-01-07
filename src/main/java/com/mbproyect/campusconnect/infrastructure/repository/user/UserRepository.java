@@ -5,9 +5,10 @@ import com.mbproyect.campusconnect.model.entity.user.UserProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
-    UserProfile findUserByUserProfile_Id(UUID userProfileId);
+    Optional<User> findByEmail(String email);
 }

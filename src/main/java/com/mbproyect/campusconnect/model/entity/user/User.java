@@ -18,6 +18,7 @@ public class User {
     @EqualsAndHashCode.Include
     private UUID userId;
 
+    @Column(nullable = false, unique = true)
     private String email;
 
     // User operations affect to userprofile
