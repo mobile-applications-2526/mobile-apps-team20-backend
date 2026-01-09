@@ -1,8 +1,3 @@
-# Comprehensive README for CampusConnect Backend
-
-Based on my exploration of the repository, here's a complete README for your project:
-
-```markdown
 # 🎓 CampusConnect Backend
 
 A robust Spring Boot backend API for the CampusConnect mobile application, enabling students to connect, create events, and participate in group chats.
@@ -78,32 +73,33 @@ CampusConnect is a campus social networking platform that provides REST APIs for
 
 ```mermaid
 graph TB
-    subgraph "Client Layer"
+    subgraph ClientLayer ["Client Layer"]
         Mobile["Mobile Application"]
     end
     
-    subgraph "API Gateway"
+    subgraph APIGateway ["API Gateway"]
         API["Spring Boot Application<br/>Port: 8080"]
     end
     
-    subgraph "Services"
-        Auth["Authentication Service<br/>- Google OAuth2<br/>- JWT<br/>- Email Verification"]
-        User["User Service<br/>- Profile Management<br/>- User Connections"]
-        Event["Event Service<br/>- Event CRUD<br/>- Participation"]
-        Chat["Chat Service<br/>- WebSocket<br/>- Real-time Messaging"]
+    subgraph Services ["Services"]
+        Auth["Authentication Service"]
+        User["User Service"]
+        Event["Event Service"]
+        Chat["Chat Service"]
     end
     
-    subgraph "Data Layer"
-        Postgres[(PostgreSQL<br/>Port: 5432)]
-        Redis[(Redis<br/>Port: 6379)]
+    subgraph DataLayer ["Data Layer"]
+        Postgres[("PostgreSQL<br/>Port: 5432")]
+        Redis[("Redis<br/>Port: 6379")]
     end
     
-    subgraph "External Services"
-        Gmail["Gmail SMTP<br/>Email Service"]
+    subgraph ExternalServices ["External Services"]
+        Gmail["Gmail SMTP"]
         Google["Google OAuth2"]
     end
     
     Mobile -->|REST/WebSocket| API
+    
     API --> Auth
     API --> User
     API --> Event
@@ -134,7 +130,7 @@ Before you begin, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Juangmz7/mobile-server.git
+git clone [https://github.com/Juangmz7/mobile-server.git](https://github.com/Juangmz7/mobile-server.git)
 cd mobile-server
 ```
 
@@ -410,300 +406,7 @@ This is a school project, but contributions are welcome! Please follow these ste
 
 This project was created as part of a school project and is currently under active development.
 
-## 👥 Authors
-
-- Juan Gómez - [Juangmz7](https://github.com/Juangmz7)
-
 ## 🙏 Acknowledgments
 
 - Spring Boot team for the excellent framework
 - The open-source community for various dependencies used in this project
-
----
-
-**Note:** This application is currently configured for local development only. For production deployment, additional security measures, environment configurations, and infrastructure setup are required.
-```
-
-## Notes
-
-This README is based on the actual codebase structure I found in your repository:
-
-- **Main Application**: [1](#0-0) 
-
-- **Tech Stack & Dependencies**: [2](#0-1) 
-
-- **Application Configuration**: [3](#0-2) 
-
-- **Authentication Features**: [4](#0-3) 
-
-The README includes comprehensive setup instructions using the updated Docker Compose configuration you provided, environment variable documentation, architecture diagrams, and detailed API documentation. The structure reflects the actual project organization with separate modules for authentication, events, users, and chat functionality. I also included troubleshooting tips and development workflow instructions to make it easier for new developers to get started.
-
-### Citations
-
-**File:** src/main/java/com/mbproyect/campusconnect/CampusconnectApplication.java (L1-13)
-```java
-package com.mbproyect.campusconnect;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class CampusconnectApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(CampusconnectApplication.class, args);
-    }
-
-}
-```
-
-**File:** pom.xml (L29-151)
-```text
-    <properties>
-        <java.version>21</java.version>
-        <lombok.version>1.18.36</lombok.version>
-    </properties>
-    <dependencies>
-
-        <!-- Web support (needed for running the WebSocket endpoint) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-<!--        Automate getters, setters & constructors-->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-<!--        Swagger documentation-->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.8.5</version>
-        </dependency>
-
-<!--        Postgres driver-->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-<!--        JPA interface (DB API)-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-
-<!--        .env-->
-        <dependency>
-            <groupId>me.paulschwarz</groupId>
-            <artifactId>spring-dotenv</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-
-        <!-- Spring WebSocket support (STOMP, message broker, endpoints, etc.) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-        </dependency>
-
-<!--        Mail dependency-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>stomp-websocket</artifactId>
-            <version>2.3.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-            <version>3.5.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-            <version>0.12.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <version>0.12.5</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-            <version>0.12.5</version>
-            <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-client</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.api-client</groupId>
-            <artifactId>google-api-client</artifactId>
-            <version>2.2.0</version>
-        </dependency>
-
-```
-
-**File:** src/main/resources/application.properties (L1-45)
-```properties
-spring.application.name=campusconnect
-server.port=${SERVER_PORT}
-
-spring.datasource.driver-class-name=org.postgresql.Driver
-spring.datasource.username=${DB_USERNAME}
-spring.datasource.password=${DB_PASSWORD}
-spring.datasource.url=${DB_URL}
-
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.defer-datasource-initialization=true
-
-# ===============================
-# SQL Initialization
-# ===============================
-spring.sql.init.mode=always
-spring.sql.init.platform=postgres
-
-spring.mail.host=smtp.gmail.com
-spring.mail.port=${MAIL_PORT}
-spring.mail.username=${MAIL_USERNAME}
-spring.mail.password=${MAIL_PASSWORD}
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
-spring.mail.properties.mail.smtp.starttls.required=true
-spring.mail.default-encoding=UTF-8
-
-spring.servlet.multipart.max-file-size=20MB
-spring.servlet.multipart.max-request-size=25MB
-
-app.encryption.key=${ENCRYPT_SECRET_KEY}
-app.secret.key=${JWT_SECRET_KEY}
-app.activate.link=${ACTIVATE_ACCOUNT_URL}
-
-spring.data.redis.host=${REDIS_HOST}
-spring.data.redis.port=${REDIS_PORT}
-
-spring.security.oauth2.client.registration.google.client-id=${GOOGLE_CLIENT_ID}
-spring.security.oauth2.client.registration.google.client-secret=${GOOGLE_CLIENT_SECRET}
-spring.security.oauth2.client.registration.google.redirect-uri=http://localhost:${SERVER_PORT}/login/oauth2/code/google
-spring.security.oauth2.client.registration.google.scope=email,profile
-
-spring.security.oauth2.client.provider.google.authorization-uri=https://accounts.google.com/o/oauth2/v2/auth
-spring.security.oauth2.client.provider.google.token-uri=https://oauth2.googleapis.com/token
-```
-
-**File:** src/main/java/com/mbproyect/campusconnect/controller/auth/AuthController.java (L17-87)
-```java
-@RestController
-@RequestMapping("/api/auth")
-public class AuthController {
-
-    private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
-
-    /**
-     *  If the email provided is in the db, an email is sent with a verification code
-     *  Returns the refresh token and a header token
-     */
-    @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody UserAuthRequest userAuthRequest) {
-        authService.login(userAuthRequest);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/google")
-    public ResponseEntity<UserAuthenticationResponse> tokenAuthentication(@RequestBody TokenRequest request) {
-        UserAuthenticationResponse response = authService.tokenAuthentication(request);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/validate-code")
-    public ResponseEntity<UserAuthenticationResponse> validateEmailCode(
-            @RequestParam String verificationCode,
-            @RequestBody UserAuthRequest request
-    ) {
-        UserAuthenticationResponse response = authService.validateEmailCode(verificationCode, request);
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     * Send an activate link with a token to the email
-     */
-    @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody UserAuthRequest request) {
-        authService.register(request);
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/activate-account")
-    public ResponseEntity<String> activateAccount(
-            @RequestParam String token,
-            @RequestParam String email
-    ) {
-        authService.activateAccount(token, email);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/refresh-token")
-    public ResponseEntity<UserAuthenticationResponse> refreshToken(
-            @RequestBody RefreshTokenRequest request
-    ) {
-        UserAuthenticationResponse response = authService.refreshToken(request);
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     *  The backend invalidates the header token & refresh token
-     */
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request) {
-        authService.logout(request);
-        return ResponseEntity.noContent().build();
-    }
-
-}
-```
