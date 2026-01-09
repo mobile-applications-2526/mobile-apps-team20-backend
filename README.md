@@ -410,10 +410,6 @@ This is a school project, but contributions are welcome! Please follow these ste
 
 This project was created as part of a school project and is currently under active development.
 
-## 👥 Authors
-
-- Juan Gómez - [Juangmz7](https://github.com/Juangmz7)
-
 ## 🙏 Acknowledgments
 
 - Spring Boot team for the excellent framework
