@@ -2,11 +2,11 @@ services:
   app:
     build: .
     environment:
-      - SERVER_PORT=8081
+      - SERVER_PORT=${SERVER_PORT}
       - DB_URL=jdbc:postgresql://postgres:5432/CampusConnect
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
-      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_HOST=redis
       - REDIS_PORT=${REDIS_PORT}
       - MAIL_PORT=${MAIL_PORT}
       - MAIL_USERNAME=${MAIL_USERNAME}
@@ -17,12 +17,13 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
     ports:
-      - "${SERVER_PORT}:8081"
+      - "${SERVER_PORT}:${SERVER_PORT}"
     depends_on:
       - postgres
       - redis
     networks:
       - my-network
+
   postgres:
     image: postgres:latest
     environment:
@@ -33,6 +34,8 @@ services:
       - "org.springframework.boot.service-connection=postgres"
     ports:
       - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - my-network
 
@@ -45,9 +48,12 @@ services:
     volumes:
       - redis_data:/data
     restart: unless-stopped
+    networks:
+      - my-network
 
 volumes:
   redis_data:
+  postgres_data:
 
 networks:
   my-network:
